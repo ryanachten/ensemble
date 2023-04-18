@@ -13,13 +13,12 @@ type VertexData struct {
 }
 
 type Vertex struct {
-	Val   VertexData       `json:"val,omitempty"`
+	Data  VertexData       `json:"data,omitempty"`
 	Edges map[string]*Edge `json:"edges,omitempty"`
 }
 
 type Edge struct {
-	Label  string  `json:"label,omitempty"`
-	Vertex *Vertex `json:"vertex,omitempty"` // TODO: pretty sure we just need to store the destination key here, not the entire vertex since this leads to a lot of redundant data
+	Label string `json:"label,omitempty"`
 }
 
 // Adjacency list graph
@@ -27,11 +26,11 @@ type Graph struct {
 	Vertices map[string]*Vertex `json:"vertices,omitempty"`
 }
 
-func (graph *Graph) AddVertex(key string, val VertexData) {
+func (graph *Graph) AddVertex(key string, data VertexData) {
 	if graph.Vertices == nil {
 		graph.Vertices = map[string]*Vertex{}
 	}
-	graph.Vertices[key] = &Vertex{Val: val, Edges: map[string]*Edge{}}
+	graph.Vertices[key] = &Vertex{Data: data, Edges: map[string]*Edge{}}
 }
 
 func (graph *Graph) AddEdge(srcKey, destKey, label string) {
@@ -42,5 +41,5 @@ func (graph *Graph) AddEdge(srcKey, destKey, label string) {
 		return
 	}
 
-	graph.Vertices[srcKey].Edges[destKey] = &Edge{Label: label, Vertex: graph.Vertices[destKey]}
+	graph.Vertices[srcKey].Edges[destKey] = &Edge{Label: label}
 }

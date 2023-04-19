@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
@@ -83,15 +84,33 @@ func ScrapeArtistMetadata(requestUrl string) ArtistMetadata {
 func scrapeInfoBoxDataLinks(element *colly.HTMLElement) []Link {
 	var links []Link
 	element.DOM.Find(".infobox-data li").Each(func(i int, s *goquery.Selection) {
-		url, urlExists := s.Find("a").Attr("href")
-		link := Link{
-			Title: s.Text(),
-		}
-		url = element.Request.AbsoluteURL(url)
-		if urlExists {
-			link.Url = &url
-		}
-		links = append(links, link)
+		url, hasUrl := s.Find("a").Attr("href")
+		links = append(links, getLink(element, s, url, hasUrl))
 	})
+
+	// Handle cases where the links are not formatted in a list
+	if len(links) == 0 {
+		element.DOM.Find(".infobox-data a").Each(func(i int, s *goquery.Selection) {
+			url, hasUrl := s.Attr("href")
+			links = append(links, getLink(element, s, url, hasUrl))
+		})
+	}
 	return links
+}
+
+func getLink(element *colly.HTMLElement, s *goquery.Selection, url string, hasUrl bool) Link {
+	// Remove footnotes from link title
+	footnoteRegex := regexp.MustCompile(`\[\d*\]`)
+	title := footnoteRegex.ReplaceAllString(s.Text(), "")
+
+	link := Link{
+		Title: title,
+	}
+
+	if hasUrl {
+		url = element.Request.AbsoluteURL(url)
+		link.Url = &url
+	}
+
+	return link
 }

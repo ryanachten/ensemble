@@ -5,12 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	models "ensemble/models"
 	services "ensemble/services"
 )
 
 func GetBand(c *gin.Context) {
 	name := c.Query("name")
 	bandName := name + " (band)" // suffix 'band' to ensure band results appear at the top of Wikipedia search results
-	metadata := services.GetBandGraph(bandName)
-	c.IndentedJSON(http.StatusOK, metadata)
+	rawGraph := services.GetBandGraph(bandName)
+	clientGraph := models.FormatClientGraph(rawGraph)
+	c.IndentedJSON(http.StatusOK, clientGraph)
 }

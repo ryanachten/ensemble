@@ -31,6 +31,10 @@ func (graph *Graph) AddVertex(key string, data VertexData) {
 	if graph.Vertices == nil {
 		graph.Vertices = map[string]*Vertex{}
 	}
+	_, vertexExists := graph.Vertices[key]
+	if vertexExists {
+		return
+	}
 	graph.Vertices[key] = &Vertex{Data: data, Edges: map[string]*Edge{}}
 }
 

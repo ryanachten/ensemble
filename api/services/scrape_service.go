@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-	"net/url"
 	"regexp"
 
 	"github.com/PuerkitoBio/goquery"
@@ -26,13 +24,10 @@ type ArtistMetadata struct {
 	FormerlyOf []Link
 }
 
-func ScrapeBandMetadata(pageTitle string) BandMetadata {
+func ScrapeBandMetadata(requestUrl string) BandMetadata {
 	c := colly.NewCollector(
 		colly.AllowedDomains("en.wikipedia.org"),
 	)
-
-	encodedTitle := url.QueryEscape(pageTitle)
-	requestUrl := fmt.Sprintf("https://en.wikipedia.org/w/index.php?title=%s", encodedTitle)
 
 	var metadata BandMetadata
 	c.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {

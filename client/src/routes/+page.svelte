@@ -6,7 +6,7 @@
 	let container: HTMLDivElement;
 
 	onMount(async () => {
-		const res = await fetch('http://localhost:8080/bands?name=Black Flag');
+		const res = await fetch('http://localhost:8080/bands?name=Black Flag&degreesOfSeparation=3');
 		const data = (await res.json()) as ElementsDefinition;
 		graph(data, container);
 	});

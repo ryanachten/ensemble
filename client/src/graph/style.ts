@@ -31,8 +31,8 @@ const style: Stylesheet[] = [
 	{
 		selector: '[type = "band"]',
 		style: {
-			backgroundColor: 'red',
-			'border-color': 'red'
+			backgroundColor: 'purple',
+			'border-color': 'purple'
 		}
 	},
 	{
@@ -40,6 +40,18 @@ const style: Stylesheet[] = [
 		style: {
 			backgroundColor: 'blue',
 			'border-color': 'blue'
+		}
+	},
+	{
+		selector: '[label = "member"], [label = "member of"]',
+		style: {
+			'line-color': 'green'
+		}
+	},
+	{
+		selector: '[label = "past member"], [label = "formerly of"]',
+		style: {
+			'line-color': 'red'
 		}
 	}
 ];

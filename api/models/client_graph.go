@@ -23,8 +23,10 @@ type ClientEdge struct {
 
 // Graph DTO formatted for client consumption
 type ClientGraph struct {
-	Nodes []ClientNode `json:"nodes,omitempty"`
-	Edges []ClientEdge `json:"edges,omitempty"`
+	NodeCount int          `json:"nodeCount,omitempty"`
+	EdgeCount int          `json:"edgeCount,omitempty"`
+	Nodes     []ClientNode `json:"nodes,omitempty"`
+	Edges     []ClientEdge `json:"edges,omitempty"`
 }
 
 // Formats Graph for client consumption
@@ -52,7 +54,9 @@ func FormatClientGraph(graph *Graph) ClientGraph {
 		}
 	}
 	return ClientGraph{
-		Nodes: nodes,
-		Edges: edges,
+		NodeCount: len(nodes),
+		EdgeCount: len(edges),
+		Nodes:     nodes,
+		Edges:     edges,
 	}
 }

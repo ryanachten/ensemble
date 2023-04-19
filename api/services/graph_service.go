@@ -3,23 +3,45 @@ package services
 import (
 	clients "ensemble/clients"
 	models "ensemble/models"
+	"fmt"
+	"net/url"
 )
 
-func GetBandGraph(bandName string) *models.Graph {
-	searchResults, err := clients.GetSearchResults(bandName)
+const MAX_LAYERS = 5 // Hard limit to prevent hypothetical endless recursive searching
+
+func SearchBandGraph(bandName string, degreesOfSeparation int) *models.Graph {
+	searchBandName := bandName + " (band)" // suffix 'band' to ensure band results appear at the top of Wikipedia search results. TODO: check if this is already present in string
+	searchResults, err := clients.GetSearchResults(searchBandName)
 	if err != nil {
 		return nil
 	}
-	metadata := ScrapeBandMetadata(searchResults[0].Title)
+
+	encodedTitle := url.QueryEscape(searchResults[0].Title)
+	requestUrl := fmt.Sprintf("https://en.wikipedia.org/w/index.php?title=%s", encodedTitle)
 
 	var graph models.Graph
-	graph.AddVertex(bandName, models.VertexData{Type: models.Band, ImageUrl: metadata.ImageUrl})
+	graph.AddVertex(bandName, models.VertexData{Type: models.Band})
+
+	maxLayers := degreesOfSeparation
+	if maxLayers > MAX_LAYERS {
+		maxLayers = MAX_LAYERS
+	}
+	return getBandGraph(bandName, requestUrl, &graph, 0, maxLayers)
+}
+
+func getBandGraph(bandName string, bandUrl string, graph *models.Graph, layer int, maxLayers int) *models.Graph {
+	if layer > maxLayers {
+		return graph
+	}
+
+	metadata := ScrapeBandMetadata(bandUrl)
+	graph.Vertices[bandName].Data.ImageUrl = metadata.ImageUrl
 
 	for _, member := range metadata.Members {
 		graph.AddVertex(member.Title, models.VertexData{Type: models.Artist, Url: member.Url})
 		graph.AddEdge(bandName, member.Title, "member")
 		if member.Url != nil {
-			GetArtistGraph(member.Title, *member.Url, &graph)
+			getArtistGraph(member.Title, *member.Url, graph, layer+1, maxLayers)
 		}
 	}
 	for _, pastMember := range metadata.PastMembers {
@@ -27,22 +49,31 @@ func GetBandGraph(bandName string) *models.Graph {
 		graph.AddEdge(bandName, pastMember.Title, "past member")
 		// TODO: can these be parallelized or something?
 		if pastMember.Url != nil {
-			GetArtistGraph(pastMember.Title, *pastMember.Url, &graph)
+			getArtistGraph(pastMember.Title, *pastMember.Url, graph, layer+1, maxLayers)
 		}
 	}
-	return &graph
+	return graph
 }
 
-func GetArtistGraph(artistName, artistUrl string, graph *models.Graph) {
+func getArtistGraph(artistName, artistUrl string, graph *models.Graph, layer int, maxLayers int) {
+	if layer > maxLayers {
+		return
+	}
 	metadata := ScrapeArtistMetadata(artistUrl)
 	graph.Vertices[artistName].Data.ImageUrl = metadata.ImageUrl
 
-	for _, member := range metadata.MemberOf {
-		graph.AddVertex(member.Title, models.VertexData{Type: models.Band, Url: member.Url})
-		graph.AddEdge(artistName, member.Title, "member of")
+	for _, currentBand := range metadata.MemberOf {
+		graph.AddVertex(currentBand.Title, models.VertexData{Type: models.Band, Url: currentBand.Url})
+		graph.AddEdge(artistName, currentBand.Title, "member of")
+		if currentBand.Url != nil {
+			getBandGraph(currentBand.Title, *currentBand.Url, graph, layer+1, maxLayers)
+		}
 	}
-	for _, pastMember := range metadata.FormerlyOf {
-		graph.AddVertex(pastMember.Title, models.VertexData{Type: models.Band, Url: pastMember.Url})
-		graph.AddEdge(artistName, pastMember.Title, "formerly of")
+	for _, formerBand := range metadata.FormerlyOf {
+		graph.AddVertex(formerBand.Title, models.VertexData{Type: models.Band, Url: formerBand.Url})
+		graph.AddEdge(artistName, formerBand.Title, "formerly of")
+		if formerBand.Url != nil {
+			getBandGraph(formerBand.Title, *formerBand.Url, graph, layer+1, maxLayers)
+		}
 	}
 }

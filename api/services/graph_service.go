@@ -13,7 +13,7 @@ func GetBandGraph(bandName string) *models.Graph {
 	metadata := ScrapeBandMetadata(searchResults[0].Title)
 
 	var graph models.Graph
-	graph.AddVertex(bandName, models.VertexData{Type: models.Band})
+	graph.AddVertex(bandName, models.VertexData{Type: models.Band, ImageUrl: metadata.ImageUrl})
 
 	for _, member := range metadata.Members {
 		graph.AddVertex(member.Title, models.VertexData{Type: models.Artist, Url: member.Url})
@@ -35,6 +35,7 @@ func GetBandGraph(bandName string) *models.Graph {
 
 func GetArtistGraph(artistName, artistUrl string, graph *models.Graph) {
 	metadata := ScrapeArtistMetadata(artistUrl)
+	graph.Vertices[artistName].Data.ImageUrl = metadata.ImageUrl
 
 	for _, member := range metadata.MemberOf {
 		graph.AddVertex(member.Title, models.VertexData{Type: models.Band, Url: member.Url})

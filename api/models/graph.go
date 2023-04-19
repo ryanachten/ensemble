@@ -3,27 +3,28 @@ package models
 type VertexType string
 
 const (
-	Band   VertexType = "Band"
-	Artist VertexType = "Artist"
+	Band   VertexType = "band"
+	Artist VertexType = "artist"
 )
 
 type VertexData struct {
-	Type VertexType `json:"type,omitempty"`
-	Url  *string    `json:"url,omitempty"`
+	Type     VertexType
+	Url      *string
+	ImageUrl string
 }
 
 type Vertex struct {
-	Data  VertexData       `json:"data,omitempty"`
-	Edges map[string]*Edge `json:"edges,omitempty"`
+	Data  VertexData
+	Edges map[string]*Edge
 }
 
 type Edge struct {
-	Label string `json:"label,omitempty"`
+	Label string
 }
 
 // Adjacency list graph
 type Graph struct {
-	Vertices map[string]*Vertex `json:"vertices,omitempty"`
+	Vertices map[string]*Vertex
 }
 
 func (graph *Graph) AddVertex(key string, data VertexData) {

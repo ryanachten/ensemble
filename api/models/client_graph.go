@@ -1,8 +1,10 @@
 package models
 
 type ClientNodeData struct {
-	Id    string `json:"id,omitempty"`
-	Label string `json:"label,omitempty"`
+	Id       string     `json:"id,omitempty"`
+	Label    string     `json:"label,omitempty"`
+	Type     VertexType `json:"type,omitempty"`
+	ImageUrl string     `json:"imageUrl,omitempty"`
 }
 
 type ClientNode struct {
@@ -33,8 +35,10 @@ func FormatClientGraph(graph *Graph) ClientGraph {
 	for vertexKey, vertexValue := range graph.Vertices {
 		nodes = append(nodes, ClientNode{
 			Data: ClientNodeData{
-				Id:    vertexKey,
-				Label: vertexKey,
+				Id:       vertexKey,
+				Label:    vertexKey,
+				Type:     vertexValue.Data.Type,
+				ImageUrl: vertexValue.Data.ImageUrl,
 			},
 		})
 		for edgeKey, edgeValue := range vertexValue.Edges {

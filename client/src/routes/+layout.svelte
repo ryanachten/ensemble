@@ -1,5 +1,5 @@
-<div class="app">
-	<main>
-		<slot />
-	</main>
-</div>
+<script>
+	import '../app.css';
+</script>
+
+<slot />

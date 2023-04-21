@@ -1,24 +1,24 @@
 package models
 
 type ClientNodeData struct {
-	Id       string     `json:"id,omitempty"`
-	Label    string     `json:"label,omitempty"`
-	Type     VertexType `json:"type,omitempty"`
+	Id       string     `json:"id"`
+	Label    string     `json:"label"`
+	Type     VertexType `json:"type"`
 	ImageUrl string     `json:"imageUrl,omitempty"`
 }
 
 type ClientNode struct {
-	Data ClientNodeData `json:"data,omitempty"`
+	Data ClientNodeData `json:"data"`
 }
 
 type ClientEdgeData struct {
-	Source string `json:"source,omitempty"`
-	Target string `json:"target,omitempty"`
-	Label  string `json:"label,omitempty"`
+	Source string `json:"source"`
+	Target string `json:"target"`
+	Label  string `json:"label"`
 }
 
 type ClientEdge struct {
-	Data ClientEdgeData `json:"data,omitempty"`
+	Data ClientEdgeData `json:"data"`
 }
 
 // Graph DTO formatted for client consumption
@@ -30,11 +30,13 @@ type ClientGraph struct {
 }
 
 // Formats Graph for client consumption
-func FormatClientGraph(graph *Graph) ClientGraph {
+func FormatClientGraph(graph *SyncGraph) ClientGraph {
 	var nodes []ClientNode
 	var edges []ClientEdge
 
-	for vertexKey, vertexValue := range graph.Vertices {
+	graph.Vertices.Range(func(key, value any) bool {
+		vertexKey := key.(string)
+		vertexValue := value.(*Vertex)
 		nodes = append(nodes, ClientNode{
 			Data: ClientNodeData{
 				Id:       vertexKey,
@@ -52,7 +54,8 @@ func FormatClientGraph(graph *Graph) ClientGraph {
 				},
 			})
 		}
-	}
+		return true
+	})
 	return ClientGraph{
 		NodeCount: len(nodes),
 		EdgeCount: len(edges),

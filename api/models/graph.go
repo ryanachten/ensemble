@@ -22,7 +22,7 @@ type Edge struct {
 	Label string
 }
 
-// Adjacency list graph
+// Adjacency list graph. Does not cater for concurrent read and writes
 type Graph struct {
 	Vertices map[string]*Vertex
 }
@@ -36,6 +36,10 @@ func (graph *Graph) AddVertex(key string, data VertexData) {
 		return
 	}
 	graph.Vertices[key] = &Vertex{Data: data, Edges: map[string]*Edge{}}
+}
+
+func (graph *Graph) UpdateVertexData(key string, imageUrl string) {
+	graph.Vertices[key].Data.ImageUrl = imageUrl
 }
 
 func (graph *Graph) AddEdge(srcKey, destKey, label string) {

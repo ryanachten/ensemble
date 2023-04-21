@@ -80,23 +80,32 @@ func scrapeInfoBoxDataLinks(element *colly.HTMLElement) []Link {
 	var links []Link
 	element.DOM.Find(".infobox-data li").Each(func(i int, s *goquery.Selection) {
 		url, hasUrl := s.Find("a").Attr("href")
-		links = append(links, getLink(element, s, url, hasUrl))
+		link, hasLink := getLink(element, s, url, hasUrl)
+		if hasLink {
+			links = append(links, link)
+		}
 	})
 
 	// Handle cases where the links are not formatted in a list
 	if len(links) == 0 {
 		element.DOM.Find(".infobox-data a").Each(func(i int, s *goquery.Selection) {
 			url, hasUrl := s.Attr("href")
-			links = append(links, getLink(element, s, url, hasUrl))
+			link, hasLink := getLink(element, s, url, hasUrl)
+			if hasLink {
+				links = append(links, link)
+			}
 		})
 	}
 	return links
 }
 
-func getLink(element *colly.HTMLElement, s *goquery.Selection, url string, hasUrl bool) Link {
+func getLink(element *colly.HTMLElement, s *goquery.Selection, url string, hasUrl bool) (Link, bool) {
 	// Remove footnotes from link title
 	footnoteRegex := regexp.MustCompile(`\[\d*\]`)
 	title := footnoteRegex.ReplaceAllString(s.Text(), "")
+	if title == "" {
+		return Link{}, false
+	}
 
 	link := Link{
 		Title: title,
@@ -107,5 +116,5 @@ func getLink(element *colly.HTMLElement, s *goquery.Selection, url string, hasUr
 		link.Url = &url
 	}
 
-	return link
+	return link, true
 }

@@ -23,7 +23,7 @@ const style: Stylesheet[] = [
 		selector: 'edge[label]',
 		style: {
 			label: 'data(label)',
-			width: 3,
+			width: 2,
 			'font-size': 5,
 			'edge-text-rotation': 'autorotate'
 		} as cytoscape.Css.Edge
@@ -51,7 +51,10 @@ const style: Stylesheet[] = [
 	{
 		selector: '[label = "past member"], [label = "formerly of"]',
 		style: {
-			'line-color': 'red'
+			'line-color': 'red',
+			'line-style': 'dashed',
+			'line-cap': 'round',
+			'line-dash-pattern': [1, 5]
 		}
 	}
 ];

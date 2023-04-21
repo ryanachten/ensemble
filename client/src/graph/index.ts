@@ -1,11 +1,18 @@
-import cytoscape, { type ElementsDefinition } from 'cytoscape';
-import layout from './layout';
+import cytoscape, { type ElementsDefinition, type LayoutOptions } from 'cytoscape';
 import style from './style';
 
-export default (graphData: ElementsDefinition, container: HTMLElement) => {
+export default ({
+	data,
+	container,
+	layout
+}: {
+	data: ElementsDefinition;
+	container: HTMLElement;
+	layout: LayoutOptions;
+}) => {
 	return cytoscape({
 		container,
-		elements: graphData,
+		elements: data,
 		style,
 		layout
 	});

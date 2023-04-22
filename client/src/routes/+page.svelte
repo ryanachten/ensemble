@@ -2,10 +2,10 @@
 	import { onMount } from 'svelte';
 	import type { ElementsDefinition } from 'cytoscape';
 	import { LayoutKeys } from '../graph/layout';
-	import { NodeType, type NodeData } from '../models/api';
 	import SearchForm from '../components/SearchForm.svelte';
 	import ResultList from '../components/ResultList.svelte';
 	import Graph from '../components/Graph.svelte';
+	import { requestBandGraph } from '../api/bands';
 
 	let bandName = 'Black Flag';
 	let degreesOfSeparation = 3;
@@ -15,29 +15,23 @@
 	let data: ElementsDefinition | null = null;
 	let selectedItem: string | undefined;
 
-	const requestGraph = async () => {
-		const res = await fetch(
-			`http://localhost:8080/bands?name=${bandName}&degreesOfSeparation=${degreesOfSeparation}`
-		);
-		data = (await res.json()) as ElementsDefinition;
-		const updatedBands: string[] = [];
-		const updatedArtists: string[] = [];
-		data.nodes.forEach((node) => {
-			const data = node.data as NodeData;
-			if (data.type === NodeType.ARTIST && data.id) {
-				updatedArtists.push(data.id);
-			}
-			if (data.type === NodeType.BAND && data.id) {
-				updatedBands.push(data.id);
-			}
-		});
-		bands = updatedBands.sort();
-		artists = updatedArtists.sort();
+	const updateGraph = async () => {
+		const {
+			data: updatedData,
+			bands: updatedBands,
+			artists: updatedArtists
+		} = await requestBandGraph(bandName, degreesOfSeparation);
+		data = updatedData;
+		bands = updatedBands;
+		artists = updatedArtists;
 	};
 
 	onMount(async () => {
-		requestGraph();
+		updateGraph();
 	});
+
+	let centerGraph: () => void;
+	const onCenterGraph = () => centerGraph();
 </script>
 
 <svelte:head>
@@ -45,19 +39,21 @@
 	<meta name="description" content="Ensemble" />
 </svelte:head>
 
-<Graph className="h-screen" bind:layoutKey bind:data />
+<Graph
+	className="h-screen"
+	bind:layoutKey
+	bind:data
+	bind:centerGraph
+	bind:selectedId={selectedItem}
+/>
 
 <SearchForm
 	className="absolute p-4 top-0 z-10"
 	bind:layoutKey
 	bind:bandName
 	bind:degreesOfSeparation
-	onSubmitForm={() => requestGraph()}
+	onSubmitForm={updateGraph}
+	{onCenterGraph}
 />
 
-<ResultList
-	className="absolute max-h-screen overflow-y-auto p-4 top-0 right-0 z-10"
-	bind:bands
-	bind:artists
-	bind:selectedItem
-/>
+<ResultList className="absolute p-4 top-0 right-0 z-10" bind:bands bind:artists bind:selectedItem />

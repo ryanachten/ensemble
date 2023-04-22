@@ -2,4 +2,6 @@
 	import '../app.css';
 </script>
 
-<slot />
+<main class="bg-base-200">
+	<slot />
+</main>

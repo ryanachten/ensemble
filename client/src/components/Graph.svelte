@@ -7,6 +7,9 @@
 	export let data: ElementsDefinition | null;
 	export let className: string | undefined = undefined;
 	export let selectedId: string | undefined = undefined;
+	export const centerGraph = () => {
+		cytoscape?.center().fit();
+	};
 
 	let container: HTMLDivElement;
 	let cytoscape: Core | null = null;

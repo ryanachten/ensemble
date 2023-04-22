@@ -5,21 +5,33 @@
 	export let selectedItem: string | undefined = undefined;
 </script>
 
-<aside class={`${className} text-right`}>
+<aside class={`${className}`}>
 	{#if bands.length > 0}
-		<strong class="block mb-2">Bands</strong>
-		<ul class="mb-4">
-			{#each bands as band}
-				<li><button on:click={() => (selectedItem = band)}>{band}</button></li>
-			{/each}
-		</ul>
+		<section class="rounded-box bg-base-100 mb-4">
+			<div class="px-4 py-2">
+				<span class="font-semibold">Bands ({bands.length})</span>
+			</div>
+			<div class="max-h-[25vh] overflow-y-auto">
+				<ul class="menu menu-compact">
+					{#each bands as band}
+						<li><button on:click={() => (selectedItem = band)}>{band}</button></li>
+					{/each}
+				</ul>
+			</div>
+		</section>
 	{/if}
 	{#if artists.length > 0}
-		<strong class="block mb-2">Artists</strong>
-		<ul>
-			{#each artists as artist}
-				<li><button on:click={() => (selectedItem = artist)}>{artist}</button></li>
-			{/each}
-		</ul>
+		<section class="rounded-box bg-base-100 mb-4">
+			<div class="px-4 py-2">
+				<span class="font-semibold">Artists ({artists.length})</span>
+			</div>
+			<div class="max-h-[25vh] overflow-y-auto">
+				<ul class="menu menu-compact">
+					{#each artists as artist}
+						<li><button on:click={() => (selectedItem = artist)}>{artist}</button></li>
+					{/each}
+				</ul>
+			</div>
+		</section>
 	{/if}
 </aside>

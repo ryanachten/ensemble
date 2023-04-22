@@ -9,7 +9,7 @@ import (
 func GetRequest(requestUrl string) ([]byte, error) {
 	res, err := http.Get(requestUrl)
 	if err != nil || res.StatusCode != 200 {
-		log.Printf("Unsuccessful GET request. Url: %s Code: %v Error %v", requestUrl, res.StatusCode, err)
+		log.Printf("Unsuccessful GET request. Error %s", err.Error())
 		return []byte{}, err
 	}
 	defer res.Body.Close()

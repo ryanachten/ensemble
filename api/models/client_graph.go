@@ -29,8 +29,8 @@ type ClientGraph struct {
 	Edges     []ClientEdge `json:"edges,omitempty"`
 }
 
-// Formats Graph for client consumption
-func FormatClientGraph(graph *SyncGraph) ClientGraph {
+// Formats SyncGraph for client consumption
+func ConvertSyncToClientGraph(graph *SyncGraph) ClientGraph {
 	var nodes []ClientNode
 	var edges []ClientEdge
 
@@ -59,6 +59,70 @@ func FormatClientGraph(graph *SyncGraph) ClientGraph {
 		})
 		return true
 	})
+	return ClientGraph{
+		NodeCount: len(nodes),
+		EdgeCount: len(edges),
+		Nodes:     nodes,
+		Edges:     edges,
+	}
+}
+
+// Formats MutexGraph for client consumption
+func ConvertMutexToClientGraph(graph *MutexGraph) ClientGraph {
+	var nodes []ClientNode
+	var edges []ClientEdge
+
+	for vertexKey, vertexValue := range graph.Vertices {
+		nodes = append(nodes, ClientNode{
+			Data: ClientNodeData{
+				Id:       vertexKey,
+				Label:    vertexKey,
+				Type:     vertexValue.Data.Type,
+				ImageUrl: vertexValue.Data.ImageUrl,
+			},
+		})
+		for edgeKey, edgeValue := range vertexValue.Edges {
+			edges = append(edges, ClientEdge{
+				Data: ClientEdgeData{
+					Source: vertexKey,
+					Target: edgeKey,
+					Label:  edgeValue.Label,
+				},
+			})
+		}
+	}
+	return ClientGraph{
+		NodeCount: len(nodes),
+		EdgeCount: len(edges),
+		Nodes:     nodes,
+		Edges:     edges,
+	}
+}
+
+// Formats MutexGraph for client consumption
+func ConvertToClientGraph(graph *Graph) ClientGraph {
+	var nodes []ClientNode
+	var edges []ClientEdge
+
+	for vertexKey, vertexValue := range graph.Vertices {
+		nodes = append(nodes, ClientNode{
+			Data: ClientNodeData{
+				Id:       vertexKey,
+				Label:    vertexKey,
+				Type:     vertexValue.Data.Type,
+				ImageUrl: vertexValue.Data.ImageUrl,
+			},
+		})
+		for edgeKey, edgeValue := range vertexValue.Edges {
+			edges = append(edges, ClientEdge{
+				Data: ClientEdgeData{
+					Source: vertexKey,
+					Target: edgeKey,
+					Label:  edgeValue.Label,
+				},
+			})
+		}
+	}
 	return ClientGraph{
 		NodeCount: len(nodes),
 		EdgeCount: len(edges),

@@ -5,11 +5,10 @@ import (
 	models "ensemble/models"
 	"fmt"
 	"net/url"
+	"sync"
 )
 
-const MAX_LAYERS = 10 // Hard limit to prevent hypothetical endless recursive searching
-
-func SearchBandGraph(bandName string, degreesOfSeparation int) (*models.Graph, error) {
+func SearchSyncBandGraph(bandName string, degreesOfSeparation int) (*models.SyncGraph, error) {
 	searchBandName := bandName + " (band)" // suffix 'band' to ensure band results appear at the top of Wikipedia search results. TODO: check if this is already present in string
 	searchResults, err := clients.GetSearchResults(searchBandName)
 	if err != nil {
@@ -19,21 +18,26 @@ func SearchBandGraph(bandName string, degreesOfSeparation int) (*models.Graph, e
 	encodedTitle := url.QueryEscape(searchResults[0].Title)
 	requestUrl := fmt.Sprintf("https://en.wikipedia.org/w/index.php?title=%s", encodedTitle)
 
-	var graph models.Graph
+	var graph models.SyncGraph
 	graph.AddVertex(bandName, models.VertexData{Type: models.Band})
 
 	maxLayers := degreesOfSeparation
 	if maxLayers > MAX_LAYERS {
 		maxLayers = MAX_LAYERS
 	}
-
-	return getBandGraph(bandName, requestUrl, &graph, 0, maxLayers), err
+	var waitGroup sync.WaitGroup
+	getSyncBandGraph(bandName, requestUrl, &graph, 0, maxLayers, &waitGroup)
+	waitGroup.Wait()
+	return &graph, err
 }
 
-func getBandGraph(bandName string, bandUrl string, graph *models.Graph, layer int, maxLayers int) *models.Graph {
+func getSyncBandGraph(bandName string, bandUrl string, graph *models.SyncGraph, layer int, maxLayers int, waitGroup *sync.WaitGroup) *models.SyncGraph {
 	if layer > maxLayers {
 		return graph
 	}
+	// Add an entry to the wait group and defer removing entry until function completes
+	waitGroup.Add(1)
+	defer waitGroup.Done()
 
 	metadata := ScrapeBandMetadata(bandUrl)
 	graph.UpdateVertexData(bandName, metadata.ImageUrl)
@@ -42,23 +46,26 @@ func getBandGraph(bandName string, bandUrl string, graph *models.Graph, layer in
 		graph.AddVertex(member.Title, models.VertexData{Type: models.Artist, Url: member.Url})
 		graph.AddEdge(bandName, member.Title, "member")
 		if member.Url != nil {
-			getArtistGraph(member.Title, *member.Url, graph, layer+1, maxLayers)
+			go getSyncArtistGraph(member.Title, *member.Url, graph, layer+1, maxLayers, waitGroup)
 		}
 	}
 	for _, pastMember := range metadata.PastMembers {
 		graph.AddVertex(pastMember.Title, models.VertexData{Type: models.Artist, Url: pastMember.Url})
 		graph.AddEdge(bandName, pastMember.Title, "past member")
 		if pastMember.Url != nil {
-			getArtistGraph(pastMember.Title, *pastMember.Url, graph, layer+1, maxLayers)
+			go getSyncArtistGraph(pastMember.Title, *pastMember.Url, graph, layer+1, maxLayers, waitGroup)
 		}
 	}
 	return graph
 }
 
-func getArtistGraph(artistName, artistUrl string, graph *models.Graph, layer int, maxLayers int) {
+func getSyncArtistGraph(artistName, artistUrl string, graph *models.SyncGraph, layer int, maxLayers int, waitGroup *sync.WaitGroup) {
 	if layer > maxLayers {
 		return
 	}
+	// Add an entry to the wait group and defer removing entry until function completes
+	waitGroup.Add(1)
+	defer waitGroup.Done()
 
 	metadata := ScrapeArtistMetadata(artistUrl)
 	graph.UpdateVertexData(artistName, metadata.ImageUrl)
@@ -67,14 +74,14 @@ func getArtistGraph(artistName, artistUrl string, graph *models.Graph, layer int
 		graph.AddVertex(currentBand.Title, models.VertexData{Type: models.Band, Url: currentBand.Url})
 		graph.AddEdge(artistName, currentBand.Title, "member of")
 		if currentBand.Url != nil {
-			go getBandGraph(currentBand.Title, *currentBand.Url, graph, layer+1, maxLayers)
+			go getSyncBandGraph(currentBand.Title, *currentBand.Url, graph, layer+1, maxLayers, waitGroup)
 		}
 	}
 	for _, formerBand := range metadata.FormerlyOf {
 		graph.AddVertex(formerBand.Title, models.VertexData{Type: models.Band, Url: formerBand.Url})
 		graph.AddEdge(artistName, formerBand.Title, "formerly of")
 		if formerBand.Url != nil {
-			go getBandGraph(formerBand.Title, *formerBand.Url, graph, layer+1, maxLayers)
+			go getSyncBandGraph(formerBand.Title, *formerBand.Url, graph, layer+1, maxLayers, waitGroup)
 		}
 	}
 }

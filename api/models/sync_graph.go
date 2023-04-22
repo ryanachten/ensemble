@@ -2,9 +2,15 @@ package models
 
 import "sync"
 
+// Vertex with edges stored using a sync map for concurrent read and writes
+type SyncVertex struct {
+	Data  VertexData
+	Edges *sync.Map // sync map[string]*Edge
+}
+
 // Adjacency list graph stored using a sync map for concurrent read and writes
 type SyncGraph struct {
-	Vertices *sync.Map
+	Vertices *sync.Map // sync map[string]*Vertex
 }
 
 func (graph *SyncGraph) AddVertex(key string, data VertexData) {
@@ -15,7 +21,7 @@ func (graph *SyncGraph) AddVertex(key string, data VertexData) {
 	if vertexExists {
 		return
 	}
-	graph.Vertices.Store(key, &Vertex{Data: data, Edges: map[string]*Edge{}})
+	graph.Vertices.Store(key, &SyncVertex{Data: data, Edges: &sync.Map{}})
 }
 
 func (graph *SyncGraph) UpdateVertexData(key string, imageUrl string) {
@@ -23,7 +29,7 @@ func (graph *SyncGraph) UpdateVertexData(key string, imageUrl string) {
 	if !vertexExists {
 		return
 	}
-	updatedVertex := vertex.(*Vertex) // sync map stores values as `any`, so we need to cast them back to vertices
+	updatedVertex := vertex.(*SyncVertex) // sync map stores values as `any`, so we need to cast them back to vertices
 	updatedVertex.Data.ImageUrl = imageUrl
 	graph.Vertices.Store(key, updatedVertex)
 }
@@ -35,7 +41,7 @@ func (graph *SyncGraph) AddEdge(srcKey, destKey, label string) {
 	if !srcVertexExists || !destVertexExists {
 		return
 	}
-	updatedVertex := srcVertex.(*Vertex)
-	updatedVertex.Edges[destKey] = &Edge{Label: label}
+	updatedVertex := srcVertex.(*SyncVertex)
+	updatedVertex.Edges.Store(destKey, &Edge{Label: label})
 	graph.Vertices.Store(srcKey, updatedVertex)
 }

@@ -34,9 +34,9 @@ func FormatClientGraph(graph *SyncGraph) ClientGraph {
 	var nodes []ClientNode
 	var edges []ClientEdge
 
-	graph.Vertices.Range(func(key, value any) bool {
-		vertexKey := key.(string)
-		vertexValue := value.(*Vertex)
+	graph.Vertices.Range(func(outerKey, outerValue any) bool {
+		vertexKey := outerKey.(string)
+		vertexValue := outerValue.(*SyncVertex)
 		nodes = append(nodes, ClientNode{
 			Data: ClientNodeData{
 				Id:       vertexKey,
@@ -45,7 +45,9 @@ func FormatClientGraph(graph *SyncGraph) ClientGraph {
 				ImageUrl: vertexValue.Data.ImageUrl,
 			},
 		})
-		for edgeKey, edgeValue := range vertexValue.Edges {
+		vertexValue.Edges.Range(func(innerKey, innerValue any) bool {
+			edgeKey := innerKey.(string)
+			edgeValue := innerValue.(*Edge)
 			edges = append(edges, ClientEdge{
 				Data: ClientEdgeData{
 					Source: vertexKey,
@@ -53,7 +55,8 @@ func FormatClientGraph(graph *SyncGraph) ClientGraph {
 					Label:  edgeValue.Label,
 				},
 			})
-		}
+			return true
+		})
 		return true
 	})
 	return ClientGraph{

@@ -67,14 +67,14 @@ func getArtistGraph(artistName, artistUrl string, graph *models.Graph, layer int
 		graph.AddVertex(currentBand.Title, models.VertexData{Type: models.Band, Url: currentBand.Url})
 		graph.AddEdge(artistName, currentBand.Title, "member of")
 		if currentBand.Url != nil {
-			go getBandGraph(currentBand.Title, *currentBand.Url, graph, layer+1, maxLayers)
+			getBandGraph(currentBand.Title, *currentBand.Url, graph, layer+1, maxLayers)
 		}
 	}
 	for _, formerBand := range metadata.FormerlyOf {
 		graph.AddVertex(formerBand.Title, models.VertexData{Type: models.Band, Url: formerBand.Url})
 		graph.AddEdge(artistName, formerBand.Title, "formerly of")
 		if formerBand.Url != nil {
-			go getBandGraph(formerBand.Title, *formerBand.Url, graph, layer+1, maxLayers)
+			getBandGraph(formerBand.Title, *formerBand.Url, graph, layer+1, maxLayers)
 		}
 	}
 }

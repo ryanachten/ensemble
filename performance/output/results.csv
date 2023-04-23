@@ -1,0 +1,25 @@
+testName,dateUtc,mode,degreesOfSeparation,vus,iterations,checksPassed,durationAvg,requestsFailed
+degreesOfSeparation-1-mode-sync,"Sun, 23 Apr 2023 16:16:04 GMT",,1,2,5,60.00%,337.77ms,0.00%
+degreesOfSeparation-1-mode-nonsync,"Sun, 23 Apr 2023 16:16:04 GMT",nonsync,1,2,5,100.00%,748.15ms,0.00%
+degreesOfSeparation-1-mode-mutex,"Sun, 23 Apr 2023 16:16:04 GMT",mutex,1,2,5,100.00%,374.01ms,0.00%
+degreesOfSeparation-1-mode-sync,"Sun, 23 Apr 2023 16:21:34 GMT",,1,2,5,100.00%,428.84ms,0.00%
+degreesOfSeparation-1-mode-nonsync,"Sun, 23 Apr 2023 16:21:34 GMT",nonsync,1,2,5,100.00%,781.21ms,0.00%
+degreesOfSeparation-1-mode-mutex,"Sun, 23 Apr 2023 16:21:34 GMT",mutex,1,2,5,60.00%,333.46ms,0.00%
+degreesOfSeparation-1-mode-sync,"Sun, 23 Apr 2023 16:23:14 GMT",,1,2,5,33.33%,1.94s,0.00%
+degreesOfSeparation-3-mode-sync,"Sun, 23 Apr 2023 16:23:14 GMT",,3,1,10,46.66%,2.5s,0.00%
+degreesOfSeparation-5-mode-sync,"Sun, 23 Apr 2023 16:23:14 GMT",,5,1,5,46.66%,5s,0.00%
+degreesOfSeparation-1-mode-nonsync,"Sun, 23 Apr 2023 16:23:14 GMT",nonsync,1,2,5,100.00%,15s,0.00%
+degreesOfSeparation-3-mode-nonsync,"Sun, 23 Apr 2023 16:23:14 GMT",nonsync,3,1,10,100.00%,7.57s,0.00%
+degreesOfSeparation-5-mode-nonsync,"Sun, 23 Apr 2023 16:23:14 GMT",nonsync,5,1,5,85.71%,49.17s,20.00%
+degreesOfSeparation-1-mode-mutex,"Sun, 23 Apr 2023 16:23:14 GMT",mutex,1,2,5,46.66%,2.9s,0.00%
+degreesOfSeparation-3-mode-mutex,"Sun, 23 Apr 2023 16:23:14 GMT",mutex,3,1,10,46.66%,2.35s,0.00%
+degreesOfSeparation-5-mode-mutex,"Sun, 23 Apr 2023 16:23:14 GMT",mutex,5,1,5,33.33%,2.13s,0.00%
+degreesOfSeparation-1-mode-sync,"Sun, 23 Apr 2023 16:40:44 GMT",,1,2,5,33.33%,2.46s,0.00%
+degreesOfSeparation-3-mode-sync,"Sun, 23 Apr 2023 16:40:44 GMT",,3,1,10,46.66%,2.82s,0.00%
+degreesOfSeparation-5-mode-sync,"Sun, 23 Apr 2023 16:40:44 GMT",,5,1,5,33.33%,2.4s,0.00%
+degreesOfSeparation-1-mode-nonsync,"Sun, 23 Apr 2023 16:40:44 GMT",nonsync,1,2,5,100.00%,14.74s,0.00%
+degreesOfSeparation-3-mode-nonsync,"Sun, 23 Apr 2023 16:40:44 GMT",nonsync,3,1,10,100.00%,8.01s,0.00%
+degreesOfSeparation-5-mode-nonsync,"Sun, 23 Apr 2023 16:40:44 GMT",nonsync,5,1,5,85.71%,52.07s,20.00%
+degreesOfSeparation-1-mode-mutex,"Sun, 23 Apr 2023 16:40:44 GMT",mutex,1,2,5,33.33%,2.54s,0.00%
+degreesOfSeparation-3-mode-mutex,"Sun, 23 Apr 2023 16:40:44 GMT",mutex,3,1,10,40.00%,2.41s,0.00%
+degreesOfSeparation-5-mode-mutex,"Sun, 23 Apr 2023 16:40:44 GMT",mutex,5,1,5,46.66%,4.45s,0.00%

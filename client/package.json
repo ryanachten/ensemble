@@ -1,6 +1,8 @@
 {
 	"name": "ensemble",
 	"version": "0.0.1",
+	"author": "Ryan Achten",
+	"license": "MIT",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",

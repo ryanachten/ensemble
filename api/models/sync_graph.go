@@ -13,8 +13,9 @@ type SyncVertex struct {
 
 // Adjacency list graph stored using a sync map for concurrent read and writes
 type SyncGraph struct {
-	Vertices sync.Map    // sync map[string]*Vertex
-	Queue    chan func() // stores a list of actions to execute sequentially
+	Vertices sync.Map       // sync map[string]*Vertex
+	Queue    chan func()    // stores a list of actions to execute sequentially
+	Actions  sync.WaitGroup // represents tasks waiting in the queue
 }
 
 func NewSyncGraph() *SyncGraph {
@@ -28,6 +29,7 @@ func NewSyncGraph() *SyncGraph {
 }
 
 func (graph *SyncGraph) AddVertex(key string, data VertexData) {
+	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		_, vertexExists := graph.Vertices.Load(key)
 		if vertexExists {
@@ -38,6 +40,7 @@ func (graph *SyncGraph) AddVertex(key string, data VertexData) {
 }
 
 func (graph *SyncGraph) UpdateVertexData(key string, imageUrl string) {
+	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		vertex, vertexExists := graph.Vertices.Load(key)
 		if !vertexExists {
@@ -50,6 +53,7 @@ func (graph *SyncGraph) UpdateVertexData(key string, imageUrl string) {
 }
 
 func (graph *SyncGraph) AddEdge(srcKey, destKey, label string) {
+	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		// Ensure src and dest keys exist
 		srcVertex, srcVertexExists := graph.Vertices.Load(srcKey)
@@ -65,10 +69,10 @@ func (graph *SyncGraph) AddEdge(srcKey, destKey, label string) {
 }
 
 // Watches for actions added to the queue.
-// When an action is added, the graph is locked, the action is executed, and then the graph is unlocked
 func (graph *SyncGraph) WatchQueue() {
 	for {
 		action := <-graph.Queue
 		action()
+		graph.Actions.Done()
 	}
 }

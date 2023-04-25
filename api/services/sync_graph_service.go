@@ -25,9 +25,10 @@ func SearchSyncBandGraph(bandName string, degreesOfSeparation int) (*models.Sync
 	if maxLayers > MAX_LAYERS {
 		maxLayers = MAX_LAYERS
 	}
-	var waitGroup sync.WaitGroup
-	getSyncBandGraph(bandName, requestUrl, graph, 0, maxLayers, &waitGroup)
-	waitGroup.Wait()
+	var requests sync.WaitGroup
+	getSyncBandGraph(bandName, requestUrl, graph, 0, maxLayers, &requests)
+	requests.Wait()      // wait for graph requests to complete
+	graph.Actions.Wait() // wait for graph updates to complete
 	return graph, err
 }
 

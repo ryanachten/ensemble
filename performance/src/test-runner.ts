@@ -9,7 +9,7 @@ enum GraphMode {
   MUTEX = "mutex",
 }
 
-const modes = [GraphMode.SYNC, GraphMode.NON_SYNC, GraphMode.MUTEX];
+const modes = [GraphMode.SYNC, GraphMode.MUTEX]; // GraphMode.NON_SYNC no longer being tested
 const degrees = [
   {
     vus: 2,

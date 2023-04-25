@@ -6,7 +6,8 @@ import "sync"
 type MutexGraph struct {
 	sync.RWMutex
 	Vertices map[string]*Vertex
-	Queue    chan func() // stores a list of actions to execute sequentially
+	Queue    chan func()    // stores a list of actions to execute sequentially
+	Actions  sync.WaitGroup // represents tasks waiting in the queue
 }
 
 func NewMutexGraph() *MutexGraph {
@@ -21,6 +22,7 @@ func NewMutexGraph() *MutexGraph {
 }
 
 func (graph *MutexGraph) AddVertex(key string, data VertexData) {
+	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		_, vertexExists := graph.Vertices[key]
 		if vertexExists {
@@ -31,12 +33,14 @@ func (graph *MutexGraph) AddVertex(key string, data VertexData) {
 }
 
 func (graph *MutexGraph) UpdateVertexData(key string, imageUrl string) {
+	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		graph.Vertices[key].Data.ImageUrl = imageUrl
 	}
 }
 
 func (graph *MutexGraph) AddEdge(srcKey, destKey, label string) {
+	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		// Ensure src and dest keys exist
 		_, srcVertexExists := graph.Vertices[srcKey]
@@ -55,6 +59,7 @@ func (graph *MutexGraph) WatchQueue() {
 		action := <-graph.Queue
 		graph.Lock()
 		action()
+		graph.Actions.Done()
 		graph.Unlock()
 	}
 }

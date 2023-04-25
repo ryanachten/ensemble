@@ -18,7 +18,7 @@ interface TestConfig {
 
 export enum GraphMode {
   SYNC = "",
-  NON_SYNC = "nonsync",
+  NON_SYNC = "insync",
   MUTEX = "mutex",
 }
 

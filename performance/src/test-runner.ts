@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 enum GraphMode {
-  SYNC = "",
-  NON_SYNC = "nonsync",
+  SYNC = "sync",
+  NON_SYNC = "insync",
   MUTEX = "mutex",
 }
 
@@ -93,7 +93,6 @@ const executeK6Test = ({
         if (stderr) {
           console.error(`stderr: ${stderr}`);
         }
-        // console.log(`stdout: ${stdout}`);
         const checksPassed = getRegexMatch(
           RegExp(/checks[\.]+\:.([\d,.]*%)/),
           stdout

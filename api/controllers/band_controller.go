@@ -22,12 +22,15 @@ func GetBand(c *gin.Context) {
 	// Switch on `mode` query string for performance testing
 	var clientGraph *models.ClientGraph
 	switch mode {
+
+	case "insync":
+		clientGraph, err = getInSyncGraph(bandName, degreesOfSeparation)
+	case "syncmap":
+		clientGraph, err = getSyncGraph(bandName, degreesOfSeparation)
 	case "mutex":
 		clientGraph, err = getMutexGraph(bandName, degreesOfSeparation)
-	case "nonsync":
-		clientGraph, err = getNonSyncGraph(bandName, degreesOfSeparation)
 	default:
-		clientGraph, err = getSyncGraph(bandName, degreesOfSeparation)
+		clientGraph, err = getMutexGraph(bandName, degreesOfSeparation)
 	}
 	if err != nil {
 		c.AbortWithStatusJSON(500, err.Error())
@@ -39,30 +42,30 @@ func GetBand(c *gin.Context) {
 
 // Graph built using the sync graph
 func getSyncGraph(bandName string, degreesOfSeparation int) (*models.ClientGraph, error) {
-	rawGraph, err := services.SearchSyncBandGraph(bandName, degreesOfSeparation)
+	syncGraph, err := services.SearchSyncBandGraph(bandName, degreesOfSeparation)
 	if err != nil {
 		return nil, err
 	}
-	clientGraph := models.ConvertSyncToClientGraph(rawGraph)
+	clientGraph := syncGraph.ToClientGraph()
 	return &clientGraph, err
 }
 
 // Graph built using the mutex graph
 func getMutexGraph(bandName string, degreesOfSeparation int) (*models.ClientGraph, error) {
-	rawGraph, err := services.SearchMutexBandGraph(bandName, degreesOfSeparation)
+	mutexGraph, err := services.SearchMutexBandGraph(bandName, degreesOfSeparation)
 	if err != nil {
 		return nil, err
 	}
-	clientGraph := models.ConvertMutexToClientGraph(rawGraph)
+	clientGraph := mutexGraph.ToClientGraph()
 	return &clientGraph, err
 }
 
 // Graph built using the original graph
-func getNonSyncGraph(bandName string, degreesOfSeparation int) (*models.ClientGraph, error) {
-	rawGraph, err := services.SearchBandGraph(bandName, degreesOfSeparation)
+func getInSyncGraph(bandName string, degreesOfSeparation int) (*models.ClientGraph, error) {
+	inSyncGraph, err := services.SearchBandGraph(bandName, degreesOfSeparation)
 	if err != nil {
 		return nil, err
 	}
-	clientGraph := models.ConvertToClientGraph(rawGraph)
+	clientGraph := inSyncGraph.ToClientGraph()
 	return &clientGraph, err
 }

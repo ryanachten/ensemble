@@ -12,5 +12,5 @@ Testing graph implementation performance and reliability using K6. Based on the 
 
 - Install dependencies `yarn install`
 - Build test scripts `yarn build` (append `--watch` to watch for changes)
-- Run test manually `k6 run --vus=1 --iterations=10 -e degreesOfSeparation=3 -e mode=nonsync -e nodeCount=101 -e edgeCount=132 dist/get-band-test.js`
+- Run test manually `k6 run --vus=1 --iterations=10 -e degreesOfSeparation=3 -e mode=mutex -e nodeCount=101 -e edgeCount=132 dist/get-band-test.js`
 - Or use custom test runner for running all tests and saving results to CSV `yarn test`

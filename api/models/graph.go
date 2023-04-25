@@ -52,3 +52,35 @@ func (graph *Graph) AddEdge(srcKey, destKey, label string) {
 
 	graph.Vertices[srcKey].Edges[destKey] = &Edge{Label: label}
 }
+
+// Formats Graph for client consumption
+func (graph *Graph) ToClientGraph() ClientGraph {
+	var nodes []ClientNode
+	var edges []ClientEdge
+
+	for vertexKey, vertexValue := range graph.Vertices {
+		nodes = append(nodes, ClientNode{
+			Data: ClientNodeData{
+				Id:       vertexKey,
+				Label:    vertexKey,
+				Type:     vertexValue.Data.Type,
+				ImageUrl: vertexValue.Data.ImageUrl,
+			},
+		})
+		for edgeKey, edgeValue := range vertexValue.Edges {
+			edges = append(edges, ClientEdge{
+				Data: ClientEdgeData{
+					Source: vertexKey,
+					Target: edgeKey,
+					Label:  edgeValue.Label,
+				},
+			})
+		}
+	}
+	return ClientGraph{
+		NodeCount: len(nodes),
+		EdgeCount: len(edges),
+		Nodes:     nodes,
+		Edges:     edges,
+	}
+}

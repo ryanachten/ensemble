@@ -76,3 +76,41 @@ func (graph *SyncGraph) WatchQueue() {
 		graph.Actions.Done()
 	}
 }
+
+// Formats SyncGraph for client consumption
+func (graph *SyncGraph) ToClientGraph() ClientGraph {
+	var nodes []ClientNode
+	var edges []ClientEdge
+
+	graph.Vertices.Range(func(outerKey, outerValue any) bool {
+		vertexKey := outerKey.(string)
+		vertexValue := outerValue.(SyncVertex)
+		nodes = append(nodes, ClientNode{
+			Data: ClientNodeData{
+				Id:       vertexKey,
+				Label:    vertexKey,
+				Type:     vertexValue.Data.Type,
+				ImageUrl: vertexValue.Data.ImageUrl,
+			},
+		})
+		vertexValue.Edges.Range(func(innerKey, innerValue any) bool {
+			edgeKey := innerKey.(string)
+			edgeValue := innerValue.(Edge)
+			edges = append(edges, ClientEdge{
+				Data: ClientEdgeData{
+					Source: vertexKey,
+					Target: edgeKey,
+					Label:  edgeValue.Label,
+				},
+			})
+			return true
+		})
+		return true
+	})
+	return ClientGraph{
+		NodeCount: len(nodes),
+		EdgeCount: len(edges),
+		Nodes:     nodes,
+		Edges:     edges,
+	}
+}

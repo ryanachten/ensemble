@@ -23,7 +23,8 @@
   },
   "scripts": {
     "build": "webpack",
-    "test": "node ./dist/test-runner.js"
+    "test": "node ./dist/test-runner.js",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "json-2-csv": "^4.0.0"

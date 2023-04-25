@@ -18,7 +18,7 @@ func SearchMutexBandGraph(bandName string, degreesOfSeparation int) (*models.Mut
 	encodedTitle := url.QueryEscape(searchResults[0].Title)
 	requestUrl := fmt.Sprintf("https://en.wikipedia.org/w/index.php?title=%s", encodedTitle)
 
-	var graph models.MutexGraph
+	var graph = models.NewMutexGraph()
 	graph.AddVertex(bandName, models.VertexData{Type: models.Band})
 
 	maxLayers := degreesOfSeparation
@@ -26,9 +26,9 @@ func SearchMutexBandGraph(bandName string, degreesOfSeparation int) (*models.Mut
 		maxLayers = MAX_LAYERS
 	}
 	var waitGroup sync.WaitGroup
-	getMutexBandGraph(bandName, requestUrl, &graph, 0, maxLayers, &waitGroup)
+	getMutexBandGraph(bandName, requestUrl, graph, 0, maxLayers, &waitGroup)
 	waitGroup.Wait()
-	return &graph, err
+	return graph, err
 }
 
 func getMutexBandGraph(bandName string, bandUrl string, graph *models.MutexGraph, layer int, maxLayers int, waitGroup *sync.WaitGroup) *models.MutexGraph {

@@ -23,3 +23,12 @@ degreesOfSeparation-5-mode-nonsync,"Sun, 23 Apr 2023 16:40:44 GMT",nonsync,5,1,5
 degreesOfSeparation-1-mode-mutex,"Sun, 23 Apr 2023 16:40:44 GMT",mutex,1,2,5,33.33%,2.54s,0.00%
 degreesOfSeparation-3-mode-mutex,"Sun, 23 Apr 2023 16:40:44 GMT",mutex,3,1,10,40.00%,2.41s,0.00%
 degreesOfSeparation-5-mode-mutex,"Sun, 23 Apr 2023 16:40:44 GMT",mutex,5,1,5,46.66%,4.45s,0.00%
+degreesOfSeparation-1-mode-sync,"Mon, 24 Apr 2023 23:55:23 GMT",,1,2,5,93.33%,2.62s,0.00%
+degreesOfSeparation-3-mode-sync,"Mon, 24 Apr 2023 23:55:23 GMT",,3,1,10,86.66%,3.46s,0.00%
+degreesOfSeparation-5-mode-sync,"Mon, 24 Apr 2023 23:55:23 GMT",,5,1,5,100.00%,7.73s,0.00%
+degreesOfSeparation-1-mode-nonsync,"Mon, 24 Apr 2023 23:55:23 GMT",nonsync,1,2,5,100.00%,8.68s,0.00%
+degreesOfSeparation-3-mode-nonsync,"Mon, 24 Apr 2023 23:55:23 GMT",nonsync,3,1,10,100.00%,7.68s,0.00%
+degreesOfSeparation-5-mode-nonsync,"Mon, 24 Apr 2023 23:55:23 GMT",nonsync,5,1,5,69.23%,52.11s,40.00%
+degreesOfSeparation-1-mode-mutex,"Mon, 24 Apr 2023 23:55:23 GMT",mutex,1,2,5,86.66%,2.49s,0.00%
+degreesOfSeparation-3-mode-mutex,"Mon, 24 Apr 2023 23:55:23 GMT",mutex,3,1,10,96.66%,3.73s,0.00%
+degreesOfSeparation-5-mode-mutex,"Mon, 24 Apr 2023 23:55:23 GMT",mutex,5,1,5,100.00%,6.91s,0.00%

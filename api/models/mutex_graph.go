@@ -3,44 +3,58 @@ package models
 import "sync"
 
 // Adjacency list graph using mutex locks for concurrent read and writes
-// While this was performant, it seemed to result in data loss. Use the more reliable `SyncGraph`
 type MutexGraph struct {
 	sync.RWMutex
 	Vertices map[string]*Vertex
+	Queue    chan func() // stores a list of actions to execute sequentially
+}
+
+func NewMutexGraph() *MutexGraph {
+	graph := &MutexGraph{
+		Vertices: make(map[string]*Vertex),
+		Queue:    make(chan func()),
+	}
+
+	go graph.WatchQueue() // start the watching process
+
+	return graph
 }
 
 func (graph *MutexGraph) AddVertex(key string, data VertexData) {
-	if graph.Vertices == nil {
-		graph.Vertices = map[string]*Vertex{}
+	graph.Queue <- func() {
+		_, vertexExists := graph.Vertices[key]
+		if vertexExists {
+			return
+		}
+		graph.Vertices[key] = &Vertex{Data: data, Edges: map[string]*Edge{}}
 	}
-	graph.Lock()
-	_, vertexExists := graph.Vertices[key]
-	graph.Unlock()
-	if vertexExists {
-		return
-	}
-	graph.Lock()
-	graph.Vertices[key] = &Vertex{Data: data, Edges: map[string]*Edge{}}
-	graph.Unlock()
 }
 
 func (graph *MutexGraph) UpdateVertexData(key string, imageUrl string) {
-	graph.Lock()
-	graph.Vertices[key].Data.ImageUrl = imageUrl
-	graph.Unlock()
+	graph.Queue <- func() {
+		graph.Vertices[key].Data.ImageUrl = imageUrl
+	}
 }
 
 func (graph *MutexGraph) AddEdge(srcKey, destKey, label string) {
-	// Ensure src and dest keys exist
-	graph.Lock()
-	_, srcVertexExists := graph.Vertices[srcKey]
-	_, destVertexExists := graph.Vertices[destKey]
-	graph.Unlock()
-	if !srcVertexExists || !destVertexExists {
-		return
+	graph.Queue <- func() {
+		// Ensure src and dest keys exist
+		_, srcVertexExists := graph.Vertices[srcKey]
+		_, destVertexExists := graph.Vertices[destKey]
+		if !srcVertexExists || !destVertexExists {
+			return
+		}
+		graph.Vertices[srcKey].Edges[destKey] = &Edge{Label: label}
 	}
+}
 
-	graph.Lock()
-	graph.Vertices[srcKey].Edges[destKey] = &Edge{Label: label}
-	graph.Unlock()
+// Watches for actions added to the queue.
+// When an action is added, the graph is locked, the action is executed, and then the graph is unlocked
+func (graph *MutexGraph) WatchQueue() {
+	for {
+		action := <-graph.Queue
+		graph.Lock()
+		action()
+		graph.Unlock()
+	}
 }

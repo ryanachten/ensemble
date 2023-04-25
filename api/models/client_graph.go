@@ -36,7 +36,7 @@ func ConvertSyncToClientGraph(graph *SyncGraph) ClientGraph {
 
 	graph.Vertices.Range(func(outerKey, outerValue any) bool {
 		vertexKey := outerKey.(string)
-		vertexValue := outerValue.(*SyncVertex)
+		vertexValue := outerValue.(SyncVertex)
 		nodes = append(nodes, ClientNode{
 			Data: ClientNodeData{
 				Id:       vertexKey,
@@ -47,7 +47,7 @@ func ConvertSyncToClientGraph(graph *SyncGraph) ClientGraph {
 		})
 		vertexValue.Edges.Range(func(innerKey, innerValue any) bool {
 			edgeKey := innerKey.(string)
-			edgeValue := innerValue.(*Edge)
+			edgeValue := innerValue.(Edge)
 			edges = append(edges, ClientEdge{
 				Data: ClientEdgeData{
 					Source: vertexKey,

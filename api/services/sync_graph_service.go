@@ -18,7 +18,7 @@ func SearchSyncBandGraph(bandName string, degreesOfSeparation int) (*models.Sync
 	encodedTitle := url.QueryEscape(searchResults[0].Title)
 	requestUrl := fmt.Sprintf("https://en.wikipedia.org/w/index.php?title=%s", encodedTitle)
 
-	var graph models.SyncGraph
+	var graph = models.NewSyncGraph()
 	graph.AddVertex(bandName, models.VertexData{Type: models.Band})
 
 	maxLayers := degreesOfSeparation
@@ -26,9 +26,9 @@ func SearchSyncBandGraph(bandName string, degreesOfSeparation int) (*models.Sync
 		maxLayers = MAX_LAYERS
 	}
 	var waitGroup sync.WaitGroup
-	getSyncBandGraph(bandName, requestUrl, &graph, 0, maxLayers, &waitGroup)
+	getSyncBandGraph(bandName, requestUrl, graph, 0, maxLayers, &waitGroup)
 	waitGroup.Wait()
-	return &graph, err
+	return graph, err
 }
 
 func getSyncBandGraph(bandName string, bandUrl string, graph *models.SyncGraph, layer int, maxLayers int, waitGroup *sync.WaitGroup) *models.SyncGraph {

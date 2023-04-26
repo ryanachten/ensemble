@@ -14,6 +14,7 @@ type Link struct {
 
 type BandMetadata struct {
 	ImageUrl    string
+	Genres      []Link
 	Members     []Link
 	PastMembers []Link
 }
@@ -50,6 +51,9 @@ func (scraper *WikiScraper) GetBandMetadata(requestUrl string) BandMetadata {
 		}
 		if label == "Past members" {
 			metadata.PastMembers = scrapeInfoBoxDataLinks(e)
+		}
+		if label == "Genres" {
+			metadata.Genres = scrapeInfoBoxDataLinks(e)
 		}
 	})
 

@@ -12,6 +12,7 @@
 	let layoutKey = LayoutKeys.COSE;
 	let artists: string[] = [];
 	let bands: string[] = [];
+	let genres: string[] = [];
 	let data: ElementsDefinition | null = null;
 	let selectedItem: string | undefined;
 
@@ -19,11 +20,13 @@
 		const {
 			data: updatedData,
 			bands: updatedBands,
-			artists: updatedArtists
+			artists: updatedArtists,
+			genres: updatedGenres
 		} = await requestBandGraph(bandName, degreesOfSeparation);
 		data = updatedData;
 		bands = updatedBands;
 		artists = updatedArtists;
+		genres = updatedGenres;
 	};
 
 	onMount(async () => {
@@ -56,4 +59,10 @@
 	{onCenterGraph}
 />
 
-<ResultList className="absolute p-4 top-0 right-0 z-10" bind:bands bind:artists bind:selectedItem />
+<ResultList
+	className="absolute p-4 top-0 right-0 z-10"
+	bind:bands
+	bind:artists
+	bind:genres
+	bind:selectedItem
+/>

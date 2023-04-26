@@ -54,6 +54,10 @@ func getBandGraph(bandName string, bandUrl string, graph *models.Graph, scraper 
 			getArtistGraph(pastMember.Title, *pastMember.Url, graph, scraper, layer+1, maxLayers)
 		}
 	}
+	for _, genre := range metadata.Genres {
+		graph.AddVertex(genre.Title, models.VertexData{Type: models.Genre, Url: genre.Url})
+		graph.AddEdge(bandName, genre.Title, "genre")
+	}
 	return graph
 }
 

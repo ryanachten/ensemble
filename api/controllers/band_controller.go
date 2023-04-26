@@ -22,7 +22,6 @@ func GetBand(c *gin.Context) {
 	// Switch on `mode` query string for performance testing
 	var clientGraph *models.ClientGraph
 	switch mode {
-
 	case "insync":
 		clientGraph, err = getInSyncGraph(bandName, degreesOfSeparation)
 	case "syncmap":

@@ -5,6 +5,7 @@ type VertexType string
 const (
 	Band   VertexType = "band"
 	Artist VertexType = "artist"
+	Genre  VertexType = "genre"
 )
 
 type VertexData struct {

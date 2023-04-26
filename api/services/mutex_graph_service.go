@@ -25,14 +25,15 @@ func SearchMutexBandGraph(bandName string, degreesOfSeparation int) (*models.Mut
 	if maxLayers > MAX_LAYERS {
 		maxLayers = MAX_LAYERS
 	}
+	scraper := models.NewWikiScraper()
 	var requests sync.WaitGroup
-	getMutexBandGraph(bandName, requestUrl, graph, 0, maxLayers, &requests)
+	getMutexBandGraph(bandName, requestUrl, graph, scraper, 0, maxLayers, &requests)
 	requests.Wait()      // wait for graph requests to complete
 	graph.Actions.Wait() // wait for graph updates to complete
 	return graph, err
 }
 
-func getMutexBandGraph(bandName string, bandUrl string, graph *models.MutexGraph, layer int, maxLayers int, waitGroup *sync.WaitGroup) *models.MutexGraph {
+func getMutexBandGraph(bandName string, bandUrl string, graph *models.MutexGraph, scraper models.WikiScraper, layer int, maxLayers int, waitGroup *sync.WaitGroup) *models.MutexGraph {
 	if layer > maxLayers {
 		return graph
 	}
@@ -40,27 +41,27 @@ func getMutexBandGraph(bandName string, bandUrl string, graph *models.MutexGraph
 	waitGroup.Add(1)
 	defer waitGroup.Done()
 
-	metadata := ScrapeBandMetadata(bandUrl)
+	metadata := scraper.GetBandMetadata(bandUrl)
 	graph.UpdateVertexData(bandName, metadata.ImageUrl)
 
 	for _, member := range metadata.Members {
 		graph.AddVertex(member.Title, models.VertexData{Type: models.Artist, Url: member.Url})
 		graph.AddEdge(bandName, member.Title, "member")
 		if member.Url != nil {
-			go getMutexArtistGraph(member.Title, *member.Url, graph, layer+1, maxLayers, waitGroup)
+			go getMutexArtistGraph(member.Title, *member.Url, graph, scraper, layer+1, maxLayers, waitGroup)
 		}
 	}
 	for _, pastMember := range metadata.PastMembers {
 		graph.AddVertex(pastMember.Title, models.VertexData{Type: models.Artist, Url: pastMember.Url})
 		graph.AddEdge(bandName, pastMember.Title, "past member")
 		if pastMember.Url != nil {
-			go getMutexArtistGraph(pastMember.Title, *pastMember.Url, graph, layer+1, maxLayers, waitGroup)
+			go getMutexArtistGraph(pastMember.Title, *pastMember.Url, graph, scraper, layer+1, maxLayers, waitGroup)
 		}
 	}
 	return graph
 }
 
-func getMutexArtistGraph(artistName, artistUrl string, graph *models.MutexGraph, layer int, maxLayers int, waitGroup *sync.WaitGroup) {
+func getMutexArtistGraph(artistName, artistUrl string, graph *models.MutexGraph, scraper models.WikiScraper, layer int, maxLayers int, waitGroup *sync.WaitGroup) {
 	if layer > maxLayers {
 		return
 	}
@@ -68,21 +69,21 @@ func getMutexArtistGraph(artistName, artistUrl string, graph *models.MutexGraph,
 	waitGroup.Add(1)
 	defer waitGroup.Done()
 
-	metadata := ScrapeArtistMetadata(artistUrl)
+	metadata := scraper.GetArtistMetadata(artistUrl)
 	graph.UpdateVertexData(artistName, metadata.ImageUrl)
 
 	for _, currentBand := range metadata.MemberOf {
 		graph.AddVertex(currentBand.Title, models.VertexData{Type: models.Band, Url: currentBand.Url})
 		graph.AddEdge(artistName, currentBand.Title, "member of")
 		if currentBand.Url != nil {
-			go getMutexBandGraph(currentBand.Title, *currentBand.Url, graph, layer+1, maxLayers, waitGroup)
+			go getMutexBandGraph(currentBand.Title, *currentBand.Url, graph, scraper, layer+1, maxLayers, waitGroup)
 		}
 	}
 	for _, formerBand := range metadata.FormerlyOf {
 		graph.AddVertex(formerBand.Title, models.VertexData{Type: models.Band, Url: formerBand.Url})
 		graph.AddEdge(artistName, formerBand.Title, "formerly of")
 		if formerBand.Url != nil {
-			go getMutexBandGraph(formerBand.Title, *formerBand.Url, graph, layer+1, maxLayers, waitGroup)
+			go getMutexBandGraph(formerBand.Title, *formerBand.Url, graph, scraper, layer+1, maxLayers, waitGroup)
 		}
 	}
 }

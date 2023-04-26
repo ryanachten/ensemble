@@ -27,54 +27,56 @@ func SearchBandGraph(bandName string, degreesOfSeparation int) (*models.Graph, e
 		maxLayers = MAX_LAYERS
 	}
 
-	return getBandGraph(bandName, requestUrl, &graph, 0, maxLayers), err
+	scraper := models.NewWikiScraper()
+
+	return getBandGraph(bandName, requestUrl, &graph, scraper, 0, maxLayers), err
 }
 
-func getBandGraph(bandName string, bandUrl string, graph *models.Graph, layer int, maxLayers int) *models.Graph {
+func getBandGraph(bandName string, bandUrl string, graph *models.Graph, scraper models.WikiScraper, layer int, maxLayers int) *models.Graph {
 	if layer > maxLayers {
 		return graph
 	}
 
-	metadata := ScrapeBandMetadata(bandUrl)
+	metadata := scraper.GetBandMetadata(bandUrl)
 	graph.UpdateVertexData(bandName, metadata.ImageUrl)
 
 	for _, member := range metadata.Members {
 		graph.AddVertex(member.Title, models.VertexData{Type: models.Artist, Url: member.Url})
 		graph.AddEdge(bandName, member.Title, "member")
 		if member.Url != nil {
-			getArtistGraph(member.Title, *member.Url, graph, layer+1, maxLayers)
+			getArtistGraph(member.Title, *member.Url, graph, scraper, layer+1, maxLayers)
 		}
 	}
 	for _, pastMember := range metadata.PastMembers {
 		graph.AddVertex(pastMember.Title, models.VertexData{Type: models.Artist, Url: pastMember.Url})
 		graph.AddEdge(bandName, pastMember.Title, "past member")
 		if pastMember.Url != nil {
-			getArtistGraph(pastMember.Title, *pastMember.Url, graph, layer+1, maxLayers)
+			getArtistGraph(pastMember.Title, *pastMember.Url, graph, scraper, layer+1, maxLayers)
 		}
 	}
 	return graph
 }
 
-func getArtistGraph(artistName, artistUrl string, graph *models.Graph, layer int, maxLayers int) {
+func getArtistGraph(artistName, artistUrl string, graph *models.Graph, scraper models.WikiScraper, layer int, maxLayers int) {
 	if layer > maxLayers {
 		return
 	}
 
-	metadata := ScrapeArtistMetadata(artistUrl)
+	metadata := scraper.GetArtistMetadata(artistUrl)
 	graph.UpdateVertexData(artistName, metadata.ImageUrl)
 
 	for _, currentBand := range metadata.MemberOf {
 		graph.AddVertex(currentBand.Title, models.VertexData{Type: models.Band, Url: currentBand.Url})
 		graph.AddEdge(artistName, currentBand.Title, "member of")
 		if currentBand.Url != nil {
-			getBandGraph(currentBand.Title, *currentBand.Url, graph, layer+1, maxLayers)
+			getBandGraph(currentBand.Title, *currentBand.Url, graph, scraper, layer+1, maxLayers)
 		}
 	}
 	for _, formerBand := range metadata.FormerlyOf {
 		graph.AddVertex(formerBand.Title, models.VertexData{Type: models.Band, Url: formerBand.Url})
 		graph.AddEdge(artistName, formerBand.Title, "formerly of")
 		if formerBand.Url != nil {
-			getBandGraph(formerBand.Title, *formerBand.Url, graph, layer+1, maxLayers)
+			getBandGraph(formerBand.Title, *formerBand.Url, graph, scraper, layer+1, maxLayers)
 		}
 	}
 }

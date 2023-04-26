@@ -6,7 +6,8 @@ export default () => {
   const nodeCount = parseInt(__ENV["nodeCount"]);
   const edgeCount = parseInt(__ENV["edgeCount"]);
 
-  if (Boolean(mode) && mode != GraphMode.MUTEX && mode != GraphMode.NON_SYNC)
+  const validModes = [GraphMode.SYNC, GraphMode.MUTEX, GraphMode.NON_SYNC];
+  if (Boolean(mode) && !validModes.includes(mode as GraphMode))
     return console.error("mode invalid", mode);
   if (!degreesOfSeparation) return console.error("degreesOfSeparation not set");
   if (!nodeCount) return console.error("nodeCount not set");

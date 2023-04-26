@@ -1,4 +1,4 @@
-package services
+package models
 
 import (
 	"regexp"
@@ -24,17 +24,26 @@ type ArtistMetadata struct {
 	FormerlyOf []Link
 }
 
-func ScrapeBandMetadata(requestUrl string) BandMetadata {
-	c := colly.NewCollector(
-		colly.AllowedDomains("en.wikipedia.org"),
-	)
+// Web-scraper for obtaining information from Wikipedia pages
+type WikiScraper struct {
+	Domains colly.CollectorOption
+}
 
+func NewWikiScraper() WikiScraper {
+	return WikiScraper{
+		Domains: colly.AllowedDomains("en.wikipedia.org"),
+	}
+}
+
+func (scraper *WikiScraper) GetBandMetadata(requestUrl string) BandMetadata {
+	collector := colly.NewCollector(scraper.Domains)
 	var metadata BandMetadata
-	c.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {
+
+	collector.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {
 		metadata.ImageUrl = "https:" + e.Attr("src")
 	})
 
-	c.OnHTML(".infobox tr", func(e *colly.HTMLElement) {
+	collector.OnHTML(".infobox tr", func(e *colly.HTMLElement) {
 		label := e.DOM.Find(".infobox-label").Text()
 		if label == "Members" {
 			metadata.Members = scrapeInfoBoxDataLinks(e)
@@ -44,24 +53,20 @@ func ScrapeBandMetadata(requestUrl string) BandMetadata {
 		}
 	})
 
-	c.Visit(requestUrl)
+	collector.Visit(requestUrl)
 
 	return metadata
 }
 
-func ScrapeArtistMetadata(requestUrl string) ArtistMetadata {
-	// TODO: do we want to store the collector as a variable to prevent instating each time?
-	c := colly.NewCollector(
-		colly.AllowedDomains("en.wikipedia.org"),
-	)
-
+func (scraper *WikiScraper) GetArtistMetadata(requestUrl string) ArtistMetadata {
+	collector := colly.NewCollector(scraper.Domains)
 	var metadata ArtistMetadata
 
-	c.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {
+	collector.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {
 		metadata.ImageUrl = "https:" + e.Attr("src")
 	})
 
-	c.OnHTML(".infobox tr", func(e *colly.HTMLElement) {
+	collector.OnHTML(".infobox tr", func(e *colly.HTMLElement) {
 		label := e.DOM.Find(".infobox-label").Text()
 		if label == "Member of" {
 			metadata.MemberOf = scrapeInfoBoxDataLinks(e)
@@ -71,7 +76,7 @@ func ScrapeArtistMetadata(requestUrl string) ArtistMetadata {
 		}
 	})
 
-	c.Visit(requestUrl)
+	collector.Visit(requestUrl)
 
 	return metadata
 }

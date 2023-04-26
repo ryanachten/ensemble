@@ -17,7 +17,7 @@ interface TestConfig {
 }
 
 export enum GraphMode {
-  SYNC = "",
+  SYNC = "sync",
   NON_SYNC = "insync",
   MUTEX = "mutex",
 }
@@ -33,7 +33,7 @@ export const BandTest = ({
   degreesOfSeparation,
   expectedResponse,
 }: TestConfig) =>
-  group(`Request using ${mode ? mode : "sync"}`, () => {
+  group(`Request using ${mode}`, () => {
     const res = http.get(
       `${BASE_URL}&degreesOfSeparation=${degreesOfSeparation}&mode=${mode}`
     );

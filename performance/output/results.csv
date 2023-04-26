@@ -50,3 +50,9 @@ degreesOfSeparation-5-mode-sync,"Tue, 25 Apr 2023 00:51:50 GMT",,5,1,5,100.00%,7
 degreesOfSeparation-1-mode-mutex,"Tue, 25 Apr 2023 00:51:50 GMT",mutex,1,2,5,100.00%,1.45s,0.00%
 degreesOfSeparation-3-mode-mutex,"Tue, 25 Apr 2023 00:51:50 GMT",mutex,3,1,10,100.00%,3.09s,0.00%
 degreesOfSeparation-5-mode-mutex,"Tue, 25 Apr 2023 00:51:50 GMT",mutex,5,1,5,100.00%,7.65s,0.00%
+degreesOfSeparation-1-mode-sync,"Wed, 26 Apr 2023 00:41:37 GMT",sync,1,2,5,100.00%,2.17s,0.00%
+degreesOfSeparation-3-mode-sync,"Wed, 26 Apr 2023 00:41:37 GMT",sync,3,1,10,100.00%,3.22s,0.00%
+degreesOfSeparation-5-mode-sync,"Wed, 26 Apr 2023 00:41:37 GMT",sync,5,1,5,100.00%,6.48s,0.00%
+degreesOfSeparation-1-mode-mutex,"Wed, 26 Apr 2023 00:41:37 GMT",mutex,1,2,5,100.00%,2.26s,0.00%
+degreesOfSeparation-3-mode-mutex,"Wed, 26 Apr 2023 00:41:37 GMT",mutex,3,1,10,100.00%,3.27s,0.00%
+degreesOfSeparation-5-mode-mutex,"Wed, 26 Apr 2023 00:41:37 GMT",mutex,5,1,5,100.00%,7.18s,0.00%

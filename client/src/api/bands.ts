@@ -1,3 +1,4 @@
+import { PUBLIC_API_URL } from '$env/static/public';
 import type { ElementsDefinition, NodeDataDefinition } from 'cytoscape';
 
 export enum NodeType {
@@ -13,7 +14,7 @@ export interface NodeData extends NodeDataDefinition {
 
 export const requestBandGraph = async (bandName: string, degreesOfSeparation: number) => {
 	const res = await fetch(
-		`http://localhost:8080/bands?name=${bandName}&degreesOfSeparation=${degreesOfSeparation}`
+		`${PUBLIC_API_URL}/bands?name=${bandName}&degreesOfSeparation=${degreesOfSeparation}`
 	);
 	const data = (await res.json()) as ElementsDefinition;
 

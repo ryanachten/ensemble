@@ -23,7 +23,7 @@ func NewSyncGraph() *SyncGraph {
 		Queue: make(chan func()),
 	}
 
-	go graph.WatchQueue() // start the watching process
+	go graph.watchQueue() // start the watching process
 
 	return graph
 }
@@ -48,8 +48,18 @@ func (graph *SyncGraph) UpdateVertexData(key string, imageUrl string) {
 		}
 		updatedVertex := vertex.(SyncVertex) // sync map stores values as `any`, so we need to cast them back to vertices
 		updatedVertex.Data.ImageUrl = imageUrl
+		updatedVertex.Data.IsComplete = true
 		graph.Vertices.Store(key, updatedVertex)
 	}
+}
+
+func (graph *SyncGraph) HasCompleteVertex(key string) bool {
+	vertex, vertexExists := graph.Vertices.Load(key)
+	if vertexExists {
+		vertexData := vertex.(SyncVertex).Data
+		return vertexData.IsComplete
+	}
+	return false
 }
 
 func (graph *SyncGraph) AddEdge(srcKey, destKey, label string) {
@@ -70,15 +80,6 @@ func (graph *SyncGraph) AddEdge(srcKey, destKey, label string) {
 
 func (graph *SyncGraph) Wait() {
 	graph.Actions.Wait()
-}
-
-// Watches for actions added to the queue.
-func (graph *SyncGraph) WatchQueue() {
-	for {
-		action := <-graph.Queue
-		action()
-		graph.Actions.Done()
-	}
 }
 
 // Formats SyncGraph for client consumption
@@ -116,5 +117,14 @@ func (graph *SyncGraph) ToClientGraph() ClientGraph {
 		EdgeCount: len(edges),
 		Nodes:     nodes,
 		Edges:     edges,
+	}
+}
+
+// Watches for actions added to the queue.
+func (graph *SyncGraph) watchQueue() {
+	for {
+		action := <-graph.Queue
+		action()
+		graph.Actions.Done()
 	}
 }

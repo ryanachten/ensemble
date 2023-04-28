@@ -16,7 +16,7 @@ func NewMutexGraph() *MutexGraph {
 		Queue:    make(chan func()),
 	}
 
-	go graph.WatchQueue() // start the watching process
+	go graph.watchQueue() // start the watching process
 
 	return graph
 }
@@ -36,7 +36,18 @@ func (graph *MutexGraph) UpdateVertexData(key string, imageUrl string) {
 	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		graph.Vertices[key].Data.ImageUrl = imageUrl
+		graph.Vertices[key].Data.IsComplete = true
 	}
+}
+
+func (graph *MutexGraph) HasCompleteVertex(key string) bool {
+	graph.RLock()
+	defer graph.RUnlock()
+	vertex, exists := graph.Vertices[key]
+	if exists {
+		return vertex.Data.IsComplete
+	}
+	return false
 }
 
 func (graph *MutexGraph) AddEdge(srcKey, destKey, label string) {
@@ -49,18 +60,6 @@ func (graph *MutexGraph) AddEdge(srcKey, destKey, label string) {
 			return
 		}
 		graph.Vertices[srcKey].Edges[destKey] = &Edge{Label: label}
-	}
-}
-
-// Watches for actions added to the queue.
-// When an action is added, the graph is locked, the action is executed, and then the graph is unlocked
-func (graph *MutexGraph) WatchQueue() {
-	for {
-		action := <-graph.Queue
-		graph.Lock()
-		action()
-		graph.Actions.Done()
-		graph.Unlock()
 	}
 }
 
@@ -97,5 +96,17 @@ func (graph *MutexGraph) ToClientGraph() ClientGraph {
 		EdgeCount: len(edges),
 		Nodes:     nodes,
 		Edges:     edges,
+	}
+}
+
+// Watches for actions added to the queue.
+// When an action is added, the graph is locked, the action is executed, and then the graph is unlocked
+func (graph *MutexGraph) watchQueue() {
+	for {
+		action := <-graph.Queue
+		graph.Lock()
+		action()
+		graph.Actions.Done()
+		graph.Unlock()
 	}
 }

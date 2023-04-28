@@ -20,6 +20,13 @@ func getConcurrentBand(bandName string, bandUrl string, graph models.ConcurrentG
 	if layer > maxLayers {
 		return graph
 	}
+
+	// If the vertex exists and complete, we don't need to revisit it
+	vertexExists := graph.HasCompleteVertex(bandName)
+	if vertexExists {
+		return graph
+	}
+
 	// Add an entry to the wait group and defer removing entry until function completes
 	waitGroup.Add(1)
 	defer waitGroup.Done()
@@ -52,6 +59,13 @@ func getConcurrentArtist(artistName, artistUrl string, graph models.ConcurrentGr
 	if layer > maxLayers {
 		return
 	}
+
+	// If the vertex exists and complete, we don't need to revisit it
+	vertexExists := graph.HasCompleteVertex(artistName)
+	if vertexExists {
+		return
+	}
+
 	// Add an entry to the wait group and defer removing entry until function completes
 	waitGroup.Add(1)
 	defer waitGroup.Done()

@@ -9,9 +9,10 @@ const (
 )
 
 type VertexData struct {
-	Type     VertexType
-	Url      *string
-	ImageUrl string
+	Type       VertexType
+	Url        *string
+	ImageUrl   string
+	IsComplete bool // Has all the necessary data for the vertex been defined. TODO: this speaks to an issue with the algorithm
 }
 
 type Vertex struct {
@@ -32,5 +33,6 @@ type Graph interface {
 
 type ConcurrentGraph interface {
 	Graph
+	HasCompleteVertex(key string) bool
 	Wait() // Waits for graph actions to complete
 }

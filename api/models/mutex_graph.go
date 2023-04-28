@@ -64,6 +64,10 @@ func (graph *MutexGraph) WatchQueue() {
 	}
 }
 
+func (graph *MutexGraph) Wait() {
+	graph.Actions.Wait()
+}
+
 // Formats MutexGraph for client consumption
 func (graph *MutexGraph) ToClientGraph() ClientGraph {
 	var nodes []ClientNode

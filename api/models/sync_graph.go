@@ -68,6 +68,10 @@ func (graph *SyncGraph) AddEdge(srcKey, destKey, label string) {
 
 }
 
+func (graph *SyncGraph) Wait() {
+	graph.Actions.Wait()
+}
+
 // Watches for actions added to the queue.
 func (graph *SyncGraph) WatchQueue() {
 	for {

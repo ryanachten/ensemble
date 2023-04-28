@@ -1,40 +1,22 @@
 package services
 
 import (
-	clients "ensemble/clients"
 	models "ensemble/models"
-	"fmt"
-	"net/url"
 	"sync"
 )
 
-func SearchSyncBandGraph(bandName string, degreesOfSeparation int) (*models.SyncGraph, error) {
-	searchBandName := bandName + " (band)" // suffix 'band' to ensure band results appear at the top of Wikipedia search results. TODO: check if this is already present in string
-	searchResults, err := clients.GetSearchResults(searchBandName)
-	if err != nil {
-		return nil, err
-	}
-
-	encodedTitle := url.QueryEscape(searchResults[0].Title)
-	requestUrl := fmt.Sprintf("https://en.wikipedia.org/w/index.php?title=%s", encodedTitle)
-
-	var graph = models.NewSyncGraph()
+// Recursively builds a band graph using concurrent requests
+func buildConcurrentBandGraph(bandName string, bandUrl string, graph models.ConcurrentGraph, scraper models.WikiScraper, maxLayers int) models.ConcurrentGraph {
 	graph.AddVertex(bandName, models.VertexData{Type: models.Band})
 
-	maxLayers := degreesOfSeparation
-	if maxLayers > MAX_LAYERS {
-		maxLayers = MAX_LAYERS
-	}
-
-	scraper := models.NewWikiScraper()
 	var requests sync.WaitGroup
-	getSyncBandGraph(bandName, requestUrl, graph, scraper, 0, maxLayers, &requests)
-	requests.Wait()      // wait for graph requests to complete
-	graph.Actions.Wait() // wait for graph updates to complete
-	return graph, err
+	getConcurrentBand(bandName, bandUrl, graph, scraper, 0, maxLayers, &requests)
+	requests.Wait() // wait for graph requests to complete
+	graph.Wait()    // wait for graph updates to complete
+	return graph
 }
 
-func getSyncBandGraph(bandName string, bandUrl string, graph *models.SyncGraph, scraper models.WikiScraper, layer int, maxLayers int, waitGroup *sync.WaitGroup) *models.SyncGraph {
+func getConcurrentBand(bandName string, bandUrl string, graph models.ConcurrentGraph, scraper models.WikiScraper, layer int, maxLayers int, waitGroup *sync.WaitGroup) models.Graph {
 	if layer > maxLayers {
 		return graph
 	}
@@ -49,14 +31,14 @@ func getSyncBandGraph(bandName string, bandUrl string, graph *models.SyncGraph, 
 		graph.AddVertex(member.Title, models.VertexData{Type: models.Artist, Url: member.Url})
 		graph.AddEdge(bandName, member.Title, "member")
 		if member.Url != nil {
-			go getSyncArtistGraph(member.Title, *member.Url, graph, scraper, layer+1, maxLayers, waitGroup)
+			go getConcurrentArtist(member.Title, *member.Url, graph, scraper, layer+1, maxLayers, waitGroup)
 		}
 	}
 	for _, pastMember := range metadata.PastMembers {
 		graph.AddVertex(pastMember.Title, models.VertexData{Type: models.Artist, Url: pastMember.Url})
 		graph.AddEdge(bandName, pastMember.Title, "past member")
 		if pastMember.Url != nil {
-			go getSyncArtistGraph(pastMember.Title, *pastMember.Url, graph, scraper, layer+1, maxLayers, waitGroup)
+			go getConcurrentArtist(pastMember.Title, *pastMember.Url, graph, scraper, layer+1, maxLayers, waitGroup)
 		}
 	}
 	for _, genre := range metadata.Genres {
@@ -66,7 +48,7 @@ func getSyncBandGraph(bandName string, bandUrl string, graph *models.SyncGraph, 
 	return graph
 }
 
-func getSyncArtistGraph(artistName, artistUrl string, graph *models.SyncGraph, scraper models.WikiScraper, layer int, maxLayers int, waitGroup *sync.WaitGroup) {
+func getConcurrentArtist(artistName, artistUrl string, graph models.ConcurrentGraph, scraper models.WikiScraper, layer int, maxLayers int, waitGroup *sync.WaitGroup) {
 	if layer > maxLayers {
 		return
 	}
@@ -81,14 +63,14 @@ func getSyncArtistGraph(artistName, artistUrl string, graph *models.SyncGraph, s
 		graph.AddVertex(currentBand.Title, models.VertexData{Type: models.Band, Url: currentBand.Url})
 		graph.AddEdge(artistName, currentBand.Title, "member of")
 		if currentBand.Url != nil {
-			go getSyncBandGraph(currentBand.Title, *currentBand.Url, graph, scraper, layer+1, maxLayers, waitGroup)
+			go getConcurrentBand(currentBand.Title, *currentBand.Url, graph, scraper, layer+1, maxLayers, waitGroup)
 		}
 	}
 	for _, formerBand := range metadata.FormerlyOf {
 		graph.AddVertex(formerBand.Title, models.VertexData{Type: models.Band, Url: formerBand.Url})
 		graph.AddEdge(artistName, formerBand.Title, "formerly of")
 		if formerBand.Url != nil {
-			go getSyncBandGraph(formerBand.Title, *formerBand.Url, graph, scraper, layer+1, maxLayers, waitGroup)
+			go getConcurrentBand(formerBand.Title, *formerBand.Url, graph, scraper, layer+1, maxLayers, waitGroup)
 		}
 	}
 }

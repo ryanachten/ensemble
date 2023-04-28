@@ -15,22 +15,22 @@ const degrees = [
     vus: 2,
     iterations: 5,
     degreesOfSeparation: 1,
-    nodeCount: 25,
-    edgeCount: 29,
+    nodeCount: 30,
+    edgeCount: 34,
   },
   {
     vus: 1,
     iterations: 10,
     degreesOfSeparation: 3,
-    nodeCount: 101,
-    edgeCount: 132,
+    nodeCount: 125,
+    edgeCount: 166,
   },
   {
     vus: 1,
     iterations: 5,
     degreesOfSeparation: 5,
-    nodeCount: 557,
-    edgeCount: 785,
+    nodeCount: 641,
+    edgeCount: 951,
   },
 ];
 

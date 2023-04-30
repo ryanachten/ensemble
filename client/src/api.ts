@@ -1,20 +1,20 @@
 import { PUBLIC_API_URL } from '$env/static/public';
-import type { ElementsDefinition, NodeDataDefinition } from 'cytoscape';
+import type { ElementsDefinition } from 'cytoscape';
+import { NodeType, type NodeData } from './interfaces';
 
-export enum NodeType {
-	ARTIST = 'artist',
-	BAND = 'band',
-	GENRE = 'genre'
-}
+export type Resource = 'bands' | 'genres';
 
-export interface NodeData extends NodeDataDefinition {
-	type: NodeType;
-	imageUrl?: string;
-}
-
-export const requestBandGraph = async (bandName: string, degreesOfSeparation: number) => {
+export const requestGraph = async ({
+	resource,
+	name,
+	degreesOfSeparation
+}: {
+	resource: Resource;
+	name: string;
+	degreesOfSeparation: number;
+}) => {
 	const res = await fetch(
-		`${PUBLIC_API_URL}/bands?name=${bandName}&degreesOfSeparation=${degreesOfSeparation}`
+		`${PUBLIC_API_URL}/${resource}?name=${name}&degreesOfSeparation=${degreesOfSeparation}`
 	);
 	const data = (await res.json()) as ElementsDefinition;
 

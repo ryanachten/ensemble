@@ -5,9 +5,10 @@
 	import SearchForm from '../components/SearchForm.svelte';
 	import ResultList from '../components/ResultList.svelte';
 	import Graph from '../components/Graph.svelte';
-	import { requestBandGraph } from '../api/bands';
+	import { requestGraph, type Resource } from '../api';
 
-	let bandName = 'Black Flag';
+	let name = 'Black Flag';
+	let resource: Resource = 'bands';
 	let degreesOfSeparation = 3;
 	let layoutKey = LayoutKeys.COSE;
 	let artists: string[] = [];
@@ -22,7 +23,7 @@
 			bands: updatedBands,
 			artists: updatedArtists,
 			genres: updatedGenres
-		} = await requestBandGraph(bandName, degreesOfSeparation);
+		} = await requestGraph({ resource, name, degreesOfSeparation });
 		data = updatedData;
 		bands = updatedBands;
 		artists = updatedArtists;
@@ -53,7 +54,8 @@
 <SearchForm
 	className="absolute p-4 top-0 z-10"
 	bind:layoutKey
-	bind:bandName
+	bind:name
+	bind:resource
 	bind:degreesOfSeparation
 	onSubmitForm={updateGraph}
 	{onCenterGraph}

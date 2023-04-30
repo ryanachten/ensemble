@@ -1,5 +1,5 @@
 import cytoscape, { type ElementsDefinition, type LayoutOptions } from 'cytoscape';
-import style from './style';
+import style from './styles';
 
 export default ({
 	data,

@@ -20,6 +20,14 @@ func (graph *InSyncGraph) UpdateVertexData(key string, imageUrl string) {
 	graph.Vertices[key].Data.ImageUrl = imageUrl
 }
 
+func (graph *InSyncGraph) HasCompleteVertex(key string) bool {
+	vertex, exists := graph.Vertices[key]
+	if exists {
+		return vertex.Data.IsComplete
+	}
+	return false
+}
+
 func (graph *InSyncGraph) AddEdge(srcKey, destKey, label string) {
 	// Ensure src and dest keys exist
 	_, srcVertexExists := graph.Vertices[srcKey]

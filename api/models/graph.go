@@ -27,12 +27,12 @@ type Edge struct {
 type Graph interface {
 	AddVertex(key string, data VertexData)
 	UpdateVertexData(key string, imageUrl string)
+	HasCompleteVertex(key string) bool
 	AddEdge(srcKey, destKey, label string)
 	ToClientGraph() ClientGraph
 }
 
 type ConcurrentGraph interface {
 	Graph
-	HasCompleteVertex(key string) bool
 	Wait() // Waits for graph actions to complete
 }

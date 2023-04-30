@@ -16,6 +16,12 @@ func getSequentialGenre(genreName string, genreUrl string, graph models.Graph, s
 		return graph
 	}
 
+	// If the vertex exists and complete, we don't need to revisit it
+	vertexExists := graph.HasCompleteVertex(genreName)
+	if vertexExists {
+		return graph
+	}
+
 	metadata := scraper.GetGenreMetadata(genreUrl)
 	graph.UpdateVertexData(genreName, metadata.ImageUrl)
 

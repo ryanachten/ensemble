@@ -16,6 +16,12 @@ func getSequentialBand(bandName string, bandUrl string, graph models.Graph, scra
 		return graph
 	}
 
+	// If the vertex exists and complete, we don't need to revisit it
+	vertexExists := graph.HasCompleteVertex(bandName)
+	if vertexExists {
+		return graph
+	}
+
 	metadata := scraper.GetBandMetadata(bandUrl)
 	graph.UpdateVertexData(bandName, metadata.ImageUrl)
 
@@ -42,6 +48,12 @@ func getSequentialBand(bandName string, bandUrl string, graph models.Graph, scra
 
 func getSequentialArtist(artistName, artistUrl string, graph models.Graph, scraper models.WikiScraper, layer int, maxLayers int) {
 	if layer > maxLayers {
+		return
+	}
+
+	// If the vertex exists and complete, we don't need to revisit it
+	vertexExists := graph.HasCompleteVertex(artistName)
+	if vertexExists {
 		return
 	}
 

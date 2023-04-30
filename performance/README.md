@@ -14,3 +14,12 @@ Testing graph implementation performance and reliability using K6. Based on the 
 - Build test scripts `yarn build` (append `--watch` to watch for changes)
 - Run test manually `k6 run --vus=1 --iterations=10 -e degreesOfSeparation=3 -e mode=mutex -e nodeCount=101 -e edgeCount=132 dist/get-band-test.js`
 - Or use custom test runner for running all tests and saving results to CSV `yarn test`
+
+## Memory profiling
+
+To profile memory in Go, we can use the `pprof` tool to investigate bottlenecks
+
+- Produce flow chart of memory allocation displayed as interactive SVG `go tool pprof -web http://localhost:8080/debug/pprof/heap`
+- Find top memory allocations
+  - Enter interactive mode `go tool pprof http://localhost:8080/debug/pprof/heap`
+  - Execute `top` command

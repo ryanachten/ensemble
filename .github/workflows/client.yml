@@ -29,7 +29,6 @@ jobs:
         run: |
           yarn build
           touch build/.nojekyll
-          ls -a
 
       - name: Upload Artifacts
         uses: actions/upload-pages-artifact@v1

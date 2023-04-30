@@ -1,12 +1,12 @@
-package services
+package strategies
 
 import (
-	models "ensemble/models"
+	"ensemble/models"
 	"sync"
 )
 
 // Recursively builds a band graph using concurrent requests
-func buildConcurrentBandGraph(bandName string, bandUrl string, graph models.ConcurrentGraph, scraper models.WikiScraper, maxLayers int) models.ConcurrentGraph {
+func BuildConcurrentBandGraph(bandName string, bandUrl string, graph models.ConcurrentGraph, scraper models.WikiScraper, maxLayers int) models.ConcurrentGraph {
 	graph.AddVertex(bandName, models.VertexData{Type: models.Band})
 
 	var requests sync.WaitGroup

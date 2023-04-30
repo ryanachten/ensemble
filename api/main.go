@@ -7,7 +7,7 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 
-	controllers "ensemble/controllers"
+	"ensemble/controllers"
 )
 
 func main() {
@@ -15,6 +15,7 @@ func main() {
 	pprof.Register(router)
 	router.Use(cors.Default())
 	router.GET("/bands", controllers.GetBand)
+	router.GET("/genres", controllers.GetGenre)
 	err := router.Run()
 	log.Printf("Router error %v", err)
 }

@@ -1,11 +1,11 @@
-package services
+package strategies
 
 import (
-	models "ensemble/models"
+	"ensemble/models"
 )
 
 // Recursively builds a band graph in sequence without concurrent requests
-func buildSequentialBandGraph(bandName string, bandUrl string, graph models.Graph, scraper models.WikiScraper, maxLayers int) models.Graph {
+func BuildSequentialBandGraph(bandName string, bandUrl string, graph models.Graph, scraper models.WikiScraper, maxLayers int) models.Graph {
 	graph.AddVertex(bandName, models.VertexData{Type: models.Band})
 
 	return getSequentialBand(bandName, bandUrl, graph, scraper, 0, maxLayers)

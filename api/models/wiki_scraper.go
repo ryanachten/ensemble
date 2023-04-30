@@ -25,6 +25,14 @@ type ArtistMetadata struct {
 	FormerlyOf []Link
 }
 
+type GenreMetadata struct {
+	ImageUrl         string
+	StylisticOrigins []Link
+	DerivativeForms  []Link
+	Subgenres        []Link
+	FusionGenres     []Link
+}
+
 // Web-scraper for obtaining information from Wikipedia pages
 type WikiScraper struct {
 	Domains colly.CollectorOption
@@ -85,6 +93,36 @@ func (scraper *WikiScraper) GetArtistMetadata(requestUrl string) ArtistMetadata 
 	return metadata
 }
 
+func (scraper *WikiScraper) GetGenreMetadata(requestUrl string) GenreMetadata {
+	collector := colly.NewCollector(scraper.Domains)
+	var metadata GenreMetadata
+
+	collector.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {
+		metadata.ImageUrl = "https:" + e.Attr("src")
+	})
+
+	collector.OnHTML(".infobox tr", func(e *colly.HTMLElement) {
+		label := e.DOM.Find(".infobox-label").Text()
+		header := e.DOM.Find(".infobox-header").Text()
+		if label == "Stylistic origins" {
+			metadata.StylisticOrigins = scrapeInfoBoxDataLinks(e)
+		}
+		if label == "Derivative forms" {
+			metadata.DerivativeForms = scrapeInfoBoxDataLinks(e)
+		}
+		if header == "Subgenres" {
+			metadata.Subgenres = scrapeInfoBoxFullDataLinks(e, e.DOM.Next())
+		}
+		if header == "Fusion genres" {
+			metadata.FusionGenres = scrapeInfoBoxFullDataLinks(e, e.DOM.Next())
+		}
+	})
+
+	collector.Visit(requestUrl)
+
+	return metadata
+}
+
 func scrapeInfoBoxDataLinks(element *colly.HTMLElement) []Link {
 	var links []Link
 	element.DOM.Find(".infobox-data li").Each(func(i int, s *goquery.Selection) {
@@ -105,6 +143,19 @@ func scrapeInfoBoxDataLinks(element *colly.HTMLElement) []Link {
 			}
 		})
 	}
+	return links
+}
+
+func scrapeInfoBoxFullDataLinks(element *colly.HTMLElement, selection *goquery.Selection) []Link {
+	var links []Link
+	selection.Find(".infobox-full-data li").Each(func(i int, s *goquery.Selection) {
+		url, hasUrl := s.Find("a").Attr("href")
+		link, hasLink := getLink(element, s, url, hasUrl)
+		if hasLink {
+			links = append(links, link)
+		}
+	})
+
 	return links
 }
 

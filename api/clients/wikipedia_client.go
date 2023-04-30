@@ -32,3 +32,8 @@ func GetSearchResults(searchTerm string) ([]WikipediaSearchItem, error) {
 	err = json.NewDecoder(strings.NewReader(string(res))).Decode(&result)
 	return result.Query.Search, err
 }
+
+func GetPageUrl(resultTitle string) string {
+	encodedTitle := url.QueryEscape(resultTitle)
+	return fmt.Sprintf("https://en.wikipedia.org/w/index.php?title=%s", encodedTitle)
+}

@@ -10,10 +10,13 @@ type GraphMetadata = {
 
 type GraphResponse = ResponseBody & GraphMetadata;
 
+export type Endpoint = "bands" | "genres";
+
 interface TestConfig {
   mode: GraphMode;
   degreesOfSeparation: number;
   expectedResponse: GraphMetadata;
+  endpoint: Endpoint;
 }
 
 export enum GraphMode {
@@ -26,16 +29,18 @@ export let baseOptions: Options = {
   iterations: 10,
 };
 
-const BASE_URL = "http://localhost:8080/bands?name=Melvins";
+const BASE_URL = "http://localhost:8080";
 
 export const BandTest = ({
   mode,
   degreesOfSeparation,
   expectedResponse,
+  endpoint,
 }: TestConfig) =>
   group(`Request using ${mode}`, () => {
+    let name = endpoint === "bands" ? "Melvins" : "Hardcore%20punk";
     const res = http.get(
-      `${BASE_URL}&degreesOfSeparation=${degreesOfSeparation}&mode=${mode}`
+      `${BASE_URL}/${endpoint}?name=${name}&degreesOfSeparation=${degreesOfSeparation}&mode=${mode}`
     );
     check(res, {
       "status is 200": () => res.status === 200,

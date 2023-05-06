@@ -1,3 +1,5 @@
+import { Endpoint } from "./base-test";
+
 const { exec } = require("child_process");
 const converter = require("json-2-csv");
 const fs = require("fs");
@@ -9,9 +11,19 @@ enum GraphMode {
   MUTEX = "mutex",
 }
 
-const modes = [GraphMode.SYNC, GraphMode.MUTEX]; // GraphMode.NON_SYNC no longer being tested
-const degrees = [
+interface DegreeConfig {
+  vus: number;
+  iterations: number;
+  degreesOfSeparation: number;
+  nodeCount: number;
+  edgeCount: number;
+  endpoint: Endpoint;
+}
+
+const modes = [GraphMode.SYNC, GraphMode.MUTEX, GraphMode.NON_SYNC];
+const degrees: DegreeConfig[] = [
   {
+    endpoint: "bands",
     vus: 2,
     iterations: 5,
     degreesOfSeparation: 1,
@@ -19,24 +31,48 @@ const degrees = [
     edgeCount: 34,
   },
   {
+    endpoint: "bands",
     vus: 1,
     iterations: 10,
     degreesOfSeparation: 3,
     nodeCount: 125,
-    edgeCount: 166,
+    edgeCount: 167,
   },
   {
+    endpoint: "bands",
     vus: 1,
     iterations: 5,
     degreesOfSeparation: 5,
     nodeCount: 641,
     edgeCount: 951,
   },
+  {
+    endpoint: "genres",
+    vus: 1,
+    iterations: 1,
+    degreesOfSeparation: 1,
+    nodeCount: 211,
+    edgeCount: 342,
+  },
+  {
+    endpoint: "genres",
+    vus: 1,
+    iterations: 3,
+    degreesOfSeparation: 2,
+    nodeCount: 693,
+    edgeCount: 2012,
+  },
 ];
+
+interface TestConfig extends DegreeConfig {
+  mode: GraphMode;
+  dateUtc: string;
+}
 
 interface TestResult {
   testName: string;
   dateUtc: string;
+  endpoint: Endpoint;
   mode: GraphMode;
   degreesOfSeparation: number;
   vus: number;
@@ -44,16 +80,6 @@ interface TestResult {
   checksPassed: string | number | null;
   requestsFailed: string | number | null;
   durationAvg: string | number | null;
-}
-
-interface TestConfig {
-  mode: GraphMode;
-  dateUtc: string;
-  vus: number;
-  iterations: number;
-  degreesOfSeparation: number;
-  nodeCount: number;
-  edgeCount: number;
 }
 
 /**
@@ -78,13 +104,14 @@ const executeK6Test = ({
   degreesOfSeparation,
   nodeCount,
   edgeCount,
+  endpoint,
 }: TestConfig): Promise<TestResult> => {
-  const testName = `degreesOfSeparation-${degreesOfSeparation}-mode-${
+  const testName = `endpoint-${endpoint}-degreesOfSeparation-${degreesOfSeparation}-mode-${
     mode ? mode : "sync"
   }`;
   return new Promise((resolve, reject) => {
     exec(
-      `k6 run --vus=${vus} --iterations=${iterations} -e degreesOfSeparation=${degreesOfSeparation} -e mode=${mode} -e nodeCount=${nodeCount} -e edgeCount=${edgeCount} dist/get-band-test.js`,
+      `k6 run --vus=${vus} --iterations=${iterations} -e endpoint=${endpoint} -e degreesOfSeparation=${degreesOfSeparation} -e mode=${mode} -e nodeCount=${nodeCount} -e edgeCount=${edgeCount} dist/get-band-test.js`,
       (error: Error, stdout: string, stderr: string) => {
         if (error) {
           console.error(`Error running test ${testName}: ${error.message}`);
@@ -109,6 +136,7 @@ const executeK6Test = ({
         resolve({
           testName,
           dateUtc,
+          endpoint,
           mode,
           degreesOfSeparation,
           vus,
@@ -127,19 +155,20 @@ const executeK6Test = ({
  */
 const runAllTests = async () => {
   const dateUtc = new Date(Date.now()).toUTCString();
-  const testRuns: Promise<TestResult>[] = [];
-  modes.forEach((mode) => {
-    degrees.forEach((config) => {
-      const promise = executeK6Test({
+  const results: TestResult[] = [];
+  const modeExecutions = modes.map(async (mode) => {
+    const degreeExecutions = degrees.map(async (config) => {
+      const result = await executeK6Test({
         mode,
         dateUtc,
         ...config,
       });
-      testRuns.push(promise);
+      results.push(result);
     });
+    await Promise.all(degreeExecutions);
   });
+  await Promise.all(modeExecutions);
 
-  const results = await Promise.all(testRuns);
   writeToFile(results);
 };
 
@@ -148,13 +177,20 @@ const runAllTests = async () => {
  * @param newResults results to append
  */
 const writeToFile = async (newResults: TestResult[]) => {
-  const filePath = path.join(__dirname, "../output/results.csv");
+  const filePath = path.join(
+    __dirname,
+    "../../client/src/routes/stats/results.csv"
+  );
   const fileContent = fs.readFileSync(filePath, {
     encoding: "utf8",
     flag: "r",
   });
 
-  const existingResults: TestResult[] = await converter.csv2json(fileContent);
+  const existingResults: TestResult[] = await converter.csv2json(fileContent, {
+    trimHeaderFields: true,
+    trimFieldValues: true,
+  });
+
   const updatedResults = existingResults.concat(newResults);
 
   const csv = await converter.json2csv(updatedResults);

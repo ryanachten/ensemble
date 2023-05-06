@@ -2,6 +2,7 @@ import type { Point } from 'chart.js';
 import { theme } from '../../theme';
 
 export type TestMode = 'mutex' | 'insync' | 'sync';
+export type Endpoint = 'bands' | 'genres';
 
 export interface CsvRow {
 	testName: string;
@@ -11,6 +12,7 @@ export interface CsvRow {
 	durationAvg: string;
 	dateUtc: string;
 	mode: TestMode;
+	endpoint: Endpoint;
 }
 
 export const colors: Record<TestMode, string> = {
@@ -21,14 +23,13 @@ export const colors: Record<TestMode, string> = {
 
 export type Dataset = {
 	label: string;
-	data: Point[];
+	data: any[];
 	borderColor: string;
 	backgroundColor: string;
 };
 
 export type ChartParams = {
 	labels: string[];
-	formattedLabels: string[];
 	results: CsvRow[];
 };
 
@@ -42,17 +43,17 @@ export const generateDataset = (
 ): Dataset[] => {
 	const datasets: Record<string, Dataset> = {};
 	results.forEach((result) => {
-		const { testName, degreesOfSeparation, mode, dateUtc } = result;
+		const { testName, endpoint, degreesOfSeparation, mode, dateUtc } = result;
 		const column = result[opts.columnKey];
 		const point = {
 			y: opts.formatValue(column),
-			x: labels.indexOf(dateUtc)
+			x: dateUtc
 		};
 		if (datasets[testName]) {
 			datasets[testName].data.push(point);
 		} else {
 			datasets[testName] = {
-				label: `${mode ? mode : 'sync'} (${degreesOfSeparation}°)`,
+				label: `${mode ? mode : 'sync'} | ${endpoint} | ${degreesOfSeparation}°`,
 				borderColor: colors[mode] ?? colors.sync,
 				backgroundColor: colors[mode] ?? colors.sync,
 				data: [point]

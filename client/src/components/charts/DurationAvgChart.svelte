@@ -5,7 +5,7 @@
 
 	export let className: string;
 
-	export const init = ({ results, labels, formattedLabels }: ChartParams) => {
+	export const init = ({ results, labels }: ChartParams) => {
 		const durationAvg = generateDataset(results, labels, {
 			columnKey: 'durationAvg',
 			formatValue: (value) => {
@@ -19,7 +19,7 @@
 		new Chart('durationAvg', {
 			type: 'bar',
 			data: {
-				labels: formattedLabels,
+				labels,
 				datasets: durationAvg
 			},
 			options: {

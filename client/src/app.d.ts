@@ -7,6 +7,10 @@ declare global {
 		// interface PageData {}
 		// interface Platform {}
 	}
+	declare module '*.csv' {
+		const content: object[];
+		export default content;
+	}
 }
 
 export {};

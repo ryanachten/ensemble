@@ -5,7 +5,7 @@
 
 	export let className: string;
 
-	export const init = ({ results, labels, formattedLabels }: ChartParams) => {
+	export const init = ({ results, labels }: ChartParams) => {
 		const requestsFailed = generateDataset(results, labels, {
 			columnKey: 'requestsFailed',
 			formatValue: (value) => parseFloat(value.replace('%', ''))
@@ -13,7 +13,7 @@
 		new Chart('requestsFailed', {
 			type: 'bar',
 			data: {
-				labels: formattedLabels,
+				labels,
 				datasets: requestsFailed
 			},
 			options: {

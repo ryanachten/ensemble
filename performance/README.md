@@ -14,6 +14,8 @@ Testing graph implementation performance and reliability using K6. Based on the 
 - Build test scripts `yarn build` (append `--watch` to watch for changes)
 - Run test manually `k6 run --vus=1 --iterations=10 -e endpoint=bands -e degreesOfSeparation=3 -e mode=mutex -e nodeCount=125 -e edgeCount=167 dist/get-band-test.js`
 - Or use custom test runner for running all tests and saving results to CSV `yarn test`
+  - We can specify what endpoints, modes and degrees of separation we want to run using optional parameters i.e. `yarn test -e bands -m sync,mutex -dos 1,2,3`
+  - For full test runner CLI parameters, run `yarn test --help`
 
 ## Memory profiling
 

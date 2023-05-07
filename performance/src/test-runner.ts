@@ -1,9 +1,11 @@
 import { Endpoint } from "./base-test";
+import config, { DegreeConfig } from "./config";
 
 const { exec } = require("child_process");
 const converter = require("json-2-csv");
 const fs = require("fs");
 const path = require("path");
+const { program } = require("commander");
 
 enum GraphMode {
   SYNC = "sync",
@@ -11,62 +13,11 @@ enum GraphMode {
   MUTEX = "mutex",
 }
 
-interface DegreeConfig {
-  vus: number;
-  iterations: number;
-  degreesOfSeparation: number;
-  nodeCount: number;
-  edgeCount: number;
-  endpoint: Endpoint;
-}
-
-const modes = [GraphMode.SYNC, GraphMode.MUTEX, GraphMode.NON_SYNC];
-const degrees: DegreeConfig[] = [
-  {
-    endpoint: "bands",
-    vus: 2,
-    iterations: 5,
-    degreesOfSeparation: 1,
-    nodeCount: 30,
-    edgeCount: 34,
-  },
-  {
-    endpoint: "bands",
-    vus: 1,
-    iterations: 10,
-    degreesOfSeparation: 3,
-    nodeCount: 125,
-    edgeCount: 167,
-  },
-  {
-    endpoint: "bands",
-    vus: 1,
-    iterations: 5,
-    degreesOfSeparation: 5,
-    nodeCount: 641,
-    edgeCount: 951,
-  },
-  {
-    endpoint: "genres",
-    vus: 1,
-    iterations: 1,
-    degreesOfSeparation: 1,
-    nodeCount: 211,
-    edgeCount: 342,
-  },
-  {
-    endpoint: "genres",
-    vus: 1,
-    iterations: 3,
-    degreesOfSeparation: 2,
-    nodeCount: 693,
-    edgeCount: 2012,
-  },
-];
-
 interface TestConfig extends DegreeConfig {
   mode: GraphMode;
   dateUtc: string;
+  degreesOfSeparation: number;
+  endpoint: Endpoint;
 }
 
 interface TestResult {
@@ -81,6 +32,39 @@ interface TestResult {
   requestsFailed: string | number | null;
   durationAvg: string | number | null;
 }
+
+program
+  .option(
+    "-dos, --degreesOfSeparation <items>",
+    "degrees of separation",
+    (value: string) => value.split(" ").map((x) => parseInt(x))
+  )
+  .option("-e, --endpoints <items>", "endpoints", (value: string) =>
+    value.split(" ")
+  )
+  .option("-m, --modes <items>", "modes", (value: string) => value.split(" "));
+
+program.parse();
+
+const {
+  degreesOfSeparation = [1, 2, 3, 5],
+  endpoints = ["bands", "genres"],
+  modes = [GraphMode.SYNC, GraphMode.MUTEX, GraphMode.NON_SYNC],
+}: {
+  degreesOfSeparation: number[];
+  endpoints: Endpoint[];
+  modes: GraphMode[];
+} = program.opts();
+
+console.log(
+  "Running tests with the following settings:",
+  "\ndegreesOfSeparation:",
+  degreesOfSeparation,
+  "\nendpoints:",
+  endpoints,
+  "\nmodes:",
+  modes
+);
 
 /**
  * Extracts match from string output or returns null
@@ -151,23 +135,31 @@ const executeK6Test = ({
 };
 
 /**
- * Runs all the test permutations based on modes and degrees of separation
+ * Runs all the test permutations based on endpoints, modes and degrees of separation
  */
 const runAllTests = async () => {
   const dateUtc = new Date(Date.now()).toUTCString();
-  const results: TestResult[] = [];
-  const modeExecutions = modes.map(async (mode) => {
-    const degreeExecutions = degrees.map(async (config) => {
-      const result = await executeK6Test({
-        mode,
-        dateUtc,
-        ...config,
-      });
-      results.push(result);
-    });
-    await Promise.all(degreeExecutions);
-  });
-  await Promise.all(modeExecutions);
+  const tests: TestConfig[] = [];
+
+  endpoints.forEach((endpoint) =>
+    degreesOfSeparation.forEach((dos) =>
+      modes.forEach((mode) => {
+        const degreeConfig = config[endpoint][dos];
+        if (degreeConfig) {
+          tests.push({
+            ...degreeConfig,
+            mode,
+            dateUtc,
+            endpoint,
+            degreesOfSeparation: dos,
+          });
+        }
+      })
+    )
+  );
+
+  const executions = tests.map(async (test) => await executeK6Test(test));
+  const results = await Promise.all(executions);
 
   writeToFile(results);
 };

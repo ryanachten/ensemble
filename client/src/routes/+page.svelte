@@ -3,7 +3,7 @@
 	import type { ElementsDefinition } from 'cytoscape';
 	import { LayoutKeys } from '../graph/layout';
 	import SearchForm from '../components/SearchForm.svelte';
-	import ResultList from '../components/ResultList.svelte';
+	import ResultLists from '../components/ResultLists.svelte';
 	import Graph from '../components/Graph.svelte';
 	import { requestGraph, type Resource } from '../api';
 
@@ -61,7 +61,7 @@
 	{onCenterGraph}
 />
 
-<ResultList
+<ResultLists
 	className="absolute p-4 top-0 right-0 z-10"
 	bind:bands
 	bind:artists

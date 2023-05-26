@@ -5,6 +5,7 @@
 	import graph from '../graph';
 	import { LayoutKeys, layouts } from '../graph/layout';
 	import Tooltip from './Tooltip.svelte';
+	import { confirmedNodePath } from '../stores';
 
 	export let layoutKey: LayoutKeys;
 	export let data: ElementsDefinition | null;
@@ -18,10 +19,37 @@
 	let cytoscape: Core | null = null;
 	let popper: Instance | undefined;
 	const CONTAINER_ID = 'tooltipWrapper';
+	const NODE_PATH_CLASS = 'node-path';
 
 	$: updateLayout(layoutKey);
 	$: selectItem(selectedId);
 	$: renderGraph(data);
+
+	confirmedNodePath.subscribe((path) => {
+		cytoscape?.$(`.${NODE_PATH_CLASS}`).each((node) => {
+			node.removeClass(NODE_PATH_CLASS);
+		});
+		if (path.length <= 1) return;
+
+		path.forEach((node, index) => {
+			if (index >= path.length - 1) return;
+			const target = cytoscape?.$id(path[index + 1].id);
+			if (!target) return;
+
+			cytoscape?.$id(node.id).addClass(NODE_PATH_CLASS);
+			const floydWarshall = cytoscape?.elements().floydWarshall({
+				weight: (node) => {
+					// Prefer not to direct paths relationships via genre nodes
+					if (node.data('label') === 'genre') return 2;
+					return 1;
+				}
+			});
+			const pathToTarget = floydWarshall?.path(cytoscape?.$id(node.id)!, target);
+			pathToTarget?.each((node) => {
+				node.addClass(NODE_PATH_CLASS);
+			});
+		});
+	});
 
 	const renderGraph = (updatedData: ElementsDefinition | null) => {
 		if (!updatedData) return;
@@ -74,6 +102,7 @@
 
 		selectedNode?.on('position', update);
 		cytoscape?.on('pan zoom resize', update);
+		cytoscape?.on('tapunselect', () => popper?.destroy());
 	};
 </script>
 

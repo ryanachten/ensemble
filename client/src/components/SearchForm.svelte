@@ -43,14 +43,12 @@
 			<label for="layoutOptions" class="label">
 				<span class="label-text">Layout mode</span>
 			</label>
-			<select class="select mr-2" name="layout options" id="layoutOptions" bind:value={layoutKey}>
+			<select class="select mr-2" id="layoutOptions" bind:value={layoutKey}>
 				<option value={LayoutKeys.COSE}>Cose</option>
 				<option value={LayoutKeys.BREADTH_FIRST}>Breadth-first</option>
 			</select>
 		</div>
-		<button class="btn btn-primary" type="submit">Search</button>
-	</div>
-	<div>
+		<button class="btn btn-primary mr-2" type="submit">Search</button>
 		<button
 			class="btn"
 			on:click={(e) => {

@@ -10,3 +10,9 @@ export interface NodeData extends NodeDataDefinition {
 	type: NodeType;
 	imageUrl?: string;
 }
+
+export interface NodeMetadata {
+	id: string;
+	label: string;
+	type: NodeType;
+}

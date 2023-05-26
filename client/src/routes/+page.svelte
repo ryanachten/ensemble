@@ -6,6 +6,8 @@
 	import ResultLists from '../components/ResultLists.svelte';
 	import Graph from '../components/Graph.svelte';
 	import { requestGraph, type Resource } from '../api';
+	import NodePath from '../components/NodePath.svelte';
+	import { nodePath } from '../stores';
 
 	let name = 'Black Flag';
 	let resource: Resource = 'bands';
@@ -51,20 +53,27 @@
 	bind:selectedId={selectedItem}
 />
 
-<SearchForm
-	className="absolute p-4 top-0 z-10"
-	bind:layoutKey
-	bind:name
-	bind:resource
-	bind:degreesOfSeparation
-	onSubmitForm={updateGraph}
-	{onCenterGraph}
-/>
+<div class="absolute p-4 top-0 z-10 flex justify-between w-screen h-screen pointer-events-none">
+	<div class="flex flex-col bg-base-100 h-fit p-4 pointer-events-auto rounded-lg">
+		<SearchForm
+			bind:layoutKey
+			bind:name
+			bind:resource
+			bind:degreesOfSeparation
+			onSubmitForm={updateGraph}
+			{onCenterGraph}
+		/>
+		{#if $nodePath.length > 0}
+			<div class="divider" />
+			<NodePath />
+		{/if}
+	</div>
 
-<ResultLists
-	className="absolute p-4 top-0 right-0 z-10"
-	bind:bands
-	bind:artists
-	bind:genres
-	bind:selectedItem
-/>
+	<ResultLists
+		className="pointer-events-auto"
+		bind:bands
+		bind:artists
+		bind:genres
+		bind:selectedItem
+	/>
+</div>

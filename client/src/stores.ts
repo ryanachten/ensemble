@@ -4,6 +4,9 @@ import type { ElementsDefinition } from 'cytoscape';
 import { LayoutKeys } from './graph/layout';
 import type { Resource } from './api';
 
+export const isLoading = writable<boolean>(false);
+export const hasError = writable<boolean>(false);
+
 export const degreesOfSeparation = writable<number>(3);
 export const layoutKey = writable<LayoutKeys>(LayoutKeys.COSE);
 export const searchTerm = writable<string>('Black Flag');

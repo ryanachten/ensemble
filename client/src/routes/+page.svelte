@@ -11,8 +11,12 @@
 		resource,
 		searchTerm,
 		layoutKey,
-		selectedItem
+		selectedItem,
+		isLoading,
+		hasError
 	} from '../stores';
+	import LoadingState from '../components/LoadingState.svelte';
+	import ErrorState from '../components/ErrorState.svelte';
 
 	const updateGraph = () =>
 		requestGraph({
@@ -27,6 +31,8 @@
 
 	let centerGraph: () => void;
 	const onCenterGraph = () => centerGraph();
+
+	$: showResults = !$isLoading && !$hasError;
 </script>
 
 <svelte:head>
@@ -34,8 +40,19 @@
 	<meta name="description" content="Ensemble" />
 </svelte:head>
 
+{#if $isLoading}
+	<div class="absolute top-0 z-5 flex flex-col justify-center items-center h-screen w-screen">
+		<LoadingState />
+	</div>
+{/if}
+{#if $hasError}
+	<div class="absolute top-0 z-5 flex flex-col justify-center items-center h-screen w-screen">
+		<ErrorState />
+	</div>
+{/if}
+
 <Graph
-	className="h-screen"
+	className={`h-screen ${!showResults ? 'opacity-0' : ''}`}
 	bind:layoutKey={$layoutKey}
 	bind:centerGraph
 	bind:selectedId={$selectedItem}
@@ -50,5 +67,7 @@
 		{/if}
 	</div>
 
-	<ResultLists className="pointer-events-auto" />
+	{#if showResults}
+		<ResultLists className="pointer-events-auto" />
+	{/if}
 </div>

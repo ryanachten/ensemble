@@ -5,7 +5,7 @@
 	import graph from '../graph';
 	import { LayoutKeys, layouts } from '../graph/layout';
 	import Tooltip from './Tooltip.svelte';
-	import { confirmedNodePath, graphData } from '../stores';
+	import { confirmedNodePath, graphData, isLoading } from '../stores';
 
 	export let layoutKey: LayoutKeys;
 	export let className: string | undefined = undefined;

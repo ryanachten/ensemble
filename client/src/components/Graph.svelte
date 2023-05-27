@@ -5,10 +5,9 @@
 	import graph from '../graph';
 	import { LayoutKeys, layouts } from '../graph/layout';
 	import Tooltip from './Tooltip.svelte';
-	import { confirmedNodePath } from '../stores';
+	import { confirmedNodePath, graphData } from '../stores';
 
 	export let layoutKey: LayoutKeys;
-	export let data: ElementsDefinition | null;
 	export let className: string | undefined = undefined;
 	export let selectedId: string | undefined = undefined;
 	export const centerGraph = () => {
@@ -19,34 +18,45 @@
 	let cytoscape: Core | null = null;
 	let popper: Instance | undefined;
 	const CONTAINER_ID = 'tooltipWrapper';
-	const NODE_PATH_CLASS = 'node-path';
+	const PATH_NODE_CLASS = 'path-node';
+	const NONE_PATH_NODE_CLASS = 'non-path-node';
 
 	$: updateLayout(layoutKey);
 	$: selectItem(selectedId);
-	$: renderGraph(data);
+	$: renderGraph($graphData);
 
 	confirmedNodePath.subscribe((path) => {
-		cytoscape?.$(`.${NODE_PATH_CLASS}`).each((node) => {
-			node.removeClass(NODE_PATH_CLASS);
+		// If there's less than one node, reset styles
+		if (path.length <= 1) {
+			cytoscape?.elements().each((node) => {
+				node.removeClass(PATH_NODE_CLASS);
+				node.removeClass(NONE_PATH_NODE_CLASS);
+			});
+			return;
+		}
+
+		cytoscape?.elements().each((node) => {
+			node.removeClass(PATH_NODE_CLASS);
+			node.addClass(NONE_PATH_NODE_CLASS);
 		});
-		if (path.length <= 1) return;
 
 		path.forEach((node, index) => {
 			if (index >= path.length - 1) return;
 			const target = cytoscape?.$id(path[index + 1].id);
 			if (!target) return;
 
-			cytoscape?.$id(node.id).addClass(NODE_PATH_CLASS);
+			cytoscape?.$id(node.id).addClass(PATH_NODE_CLASS);
 			const floydWarshall = cytoscape?.elements().floydWarshall({
 				weight: (node) => {
-					// Prefer not to direct paths relationships via genre nodes
+					// Prefer not to direct path relationships via genre nodes
 					if (node.data('label') === 'genre') return 2;
 					return 1;
 				}
 			});
 			const pathToTarget = floydWarshall?.path(cytoscape?.$id(node.id)!, target);
 			pathToTarget?.each((node) => {
-				node.addClass(NODE_PATH_CLASS);
+				node.addClass(PATH_NODE_CLASS);
+				node.removeClass(NONE_PATH_NODE_CLASS);
 			});
 		});
 	});
@@ -102,7 +112,7 @@
 
 		selectedNode?.on('position', update);
 		cytoscape?.on('pan zoom resize', update);
-		cytoscape?.on('tapunselect', () => popper?.destroy());
+		cytoscape?.on('tapunselect destroy', () => popper?.destroy());
 	};
 </script>
 

@@ -1,48 +1,50 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 import type { ElementsDefinition } from 'cytoscape';
 import { NodeType, type NodeData } from './interfaces';
+import { bands, artists, genres, graphData, nodePath, confirmedNodePath } from './stores';
 
 export type Resource = 'bands' | 'genres';
+export type RequestGraphOptions = {
+	resource: Resource;
+	name: string;
+	degreesOfSeparation: number;
+};
 
 export const requestGraph = async ({
 	resource,
 	name,
 	degreesOfSeparation
-}: {
-	resource: Resource;
-	name: string;
-	degreesOfSeparation: number;
-}) => {
+}: RequestGraphOptions) => {
 	const res = await fetch(
 		`${PUBLIC_API_URL}/${resource}?name=${name}&degreesOfSeparation=${degreesOfSeparation}`
 	);
 	const data = (await res.json()) as ElementsDefinition;
 
-	const bands: string[] = [];
-	const artists: string[] = [];
-	const genres: string[] = [];
+	const _bands: string[] = [];
+	const _artists: string[] = [];
+	const _genres: string[] = [];
 
 	data.nodes.forEach((node) => {
 		const data = node.data as NodeData;
 		if (data.type === NodeType.ARTIST && data.id) {
-			bands.push(data.id);
+			_artists.push(data.id);
 		}
 		if (data.type === NodeType.BAND && data.id) {
-			artists.push(data.id);
+			_bands.push(data.id);
 		}
 		if (data.type === NodeType.GENRE && data.id) {
-			genres.push(data.id);
+			_genres.push(data.id);
 		}
 	});
 
-	artists.sort();
-	bands.sort();
-	genres.sort();
+	_artists.sort();
+	_bands.sort();
+	_genres.sort();
 
-	return {
-		data,
-		bands,
-		artists,
-		genres
-	};
+	bands.set(_bands);
+	artists.set(_artists);
+	genres.set(_genres);
+	graphData.set(data);
+	nodePath.set([]);
+	confirmedNodePath.set([]);
 };

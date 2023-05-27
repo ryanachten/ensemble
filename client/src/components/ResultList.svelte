@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { selectedItem } from '../stores';
+
 	export let items: string[];
 	export let title: string;
-	export let selectedItem: string | undefined;
 </script>
 
 <section class="rounded-box bg-base-100 mb-4">
@@ -12,7 +13,7 @@
 		<ul class="menu menu-compact">
 			{#each items as item}
 				<li>
-					<button class:active={selectedItem === item} on:click={() => (selectedItem = item)}
+					<button class:active={$selectedItem === item} on:click={() => selectedItem.set(item)}
 						>{item}</button
 					>
 				</li>

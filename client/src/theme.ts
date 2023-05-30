@@ -1,15 +1,15 @@
 import { NodeType } from './interfaces';
 
 export const theme = {
-	primary: '#570DF8',
-	secondary: '#F000B8',
-	accent: '#37CDBE',
-	neutral: '#3D4451',
+	primary: '#af91ff',
+	secondary: '#50c1f1',
+	accent: '#68e8c8',
+	neutral: '#264653',
 	'base-100': '#FFFFFF',
-	info: '#3ABFF8',
-	success: '#36D399',
-	warning: '#FBBD23',
-	error: '#F87272'
+	info: '#50c1f1',
+	success: '#68e8c8',
+	warning: '#f5bd56',
+	error: '#e76f51'
 };
 type Theme = typeof theme;
 

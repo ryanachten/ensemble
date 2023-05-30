@@ -17,6 +17,7 @@
 	} from '../stores';
 	import LoadingState from '../components/LoadingState.svelte';
 	import ErrorState from '../components/ErrorState.svelte';
+	import Logo from '../components/Logo.svelte';
 
 	const updateGraph = () =>
 		requestGraph({
@@ -36,8 +37,12 @@
 </script>
 
 <svelte:head>
-	<title>Ensemble</title>
+	<title>ensemble</title>
 	<meta name="description" content="Ensemble" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Teko:wght@700&display=swap"
+		rel="stylesheet"
+	/>
 </svelte:head>
 
 {#if $isLoading}
@@ -60,6 +65,8 @@
 
 <div class="absolute p-4 top-0 z-10 flex justify-between w-screen h-screen pointer-events-none">
 	<div class="flex flex-col bg-base-100 h-fit p-4 pointer-events-auto rounded-lg mr-4">
+		<Logo />
+
 		<SearchForm onSubmitForm={updateGraph} {onCenterGraph} />
 		{#if $nodePath.length > 0}
 			<div class="divider" />

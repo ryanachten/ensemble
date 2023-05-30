@@ -12,6 +12,13 @@ const commonStyles: Stylesheet[] = [
 		}
 	},
 	{
+		selector: '[label]',
+		style: {
+			'font-family': 'Open Sans',
+			color: theme.neutral
+		}
+	},
+	{
 		selector: 'node[label]',
 		style: {
 			label: 'data(label)',

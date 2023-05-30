@@ -6,8 +6,8 @@
 </script>
 
 <section class="rounded-box bg-base-100 mb-4">
-	<div class="px-4 py-2">
-		<span class="font-semibold">{title} ({items.length})</span>
+	<div class="px-4 pt-2">
+		<span class="font-semibold text-sm">{title} ({items.length})</span>
 	</div>
 	<div class="max-h-[25vh] overflow-y-auto">
 		<ul class="menu menu-compact">

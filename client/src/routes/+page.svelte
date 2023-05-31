@@ -75,6 +75,6 @@
 	</div>
 
 	{#if showResults}
-		<ResultLists className="pointer-events-auto" />
+		<ResultLists />
 	{/if}
 </div>

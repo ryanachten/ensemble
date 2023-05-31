@@ -6,9 +6,14 @@ const commonStyles: Stylesheet[] = [
 	{
 		selector: 'node',
 		style: {
-			'background-image': 'data(imageUrl)',
-			'background-fit': 'cover',
 			'border-width': 1
+		}
+	},
+	{
+		selector: '[imageUrl]',
+		style: {
+			'background-image': 'data(imageUrl)',
+			'background-fit': 'cover'
 		}
 	},
 	{

@@ -2,6 +2,8 @@ import cytoscape, { type ElementsDefinition, type LayoutOptions } from 'cytoscap
 import popper from 'cytoscape-popper';
 import style from './styles';
 
+cytoscape.use(popper);
+
 export default ({
 	data,
 	container,
@@ -11,7 +13,6 @@ export default ({
 	container: HTMLElement;
 	layout: LayoutOptions;
 }) => {
-	cytoscape.use(popper);
 	return cytoscape({
 		container,
 		elements: data,

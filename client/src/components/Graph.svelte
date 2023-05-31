@@ -24,6 +24,13 @@
 	$: updateLayout(layoutKey);
 	$: selectItem(selectedId);
 	$: renderGraph($graphData);
+	$: onLoad($isLoading);
+
+	const onLoad = (_loading: boolean) => {
+		if ($isLoading) {
+			destroyPopover();
+		}
+	};
 
 	confirmedNodePath.subscribe((path) => {
 		// If there's less than one node, reset styles
@@ -76,7 +83,7 @@
 		updatedLayout?.run();
 	};
 
-	const deletePopover = () => {
+	const destroyPopover = () => {
 		popper?.destroy();
 		const remainingContainer = document.getElementById(CONTAINER_ID);
 		remainingContainer && document.body.removeChild(remainingContainer);
@@ -84,7 +91,7 @@
 
 	const selectItem = (id: string | undefined) => {
 		if (!id) return;
-		deletePopover();
+		destroyPopover();
 
 		const selectedNode = cytoscape?.$id(id);
 		const selection = selectedNode?.connectedEdges().connectedNodes();
@@ -112,7 +119,7 @@
 
 		selectedNode?.on('position', update);
 		cytoscape?.on('pan zoom resize', update);
-		cytoscape?.on('tapunselect destroy', () => popper?.destroy());
+		cytoscape?.on('tapunselect', destroyPopover);
 	};
 </script>
 

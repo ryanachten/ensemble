@@ -5,7 +5,7 @@
 	export let title: string;
 </script>
 
-<section class="rounded-box bg-base-100 mb-4">
+<section class="rounded-box bg-base-100 mb-4 pointer-events-auto">
 	<div class="px-4 pt-2">
 		<span class="font-semibold text-sm">{title} ({items.length})</span>
 	</div>

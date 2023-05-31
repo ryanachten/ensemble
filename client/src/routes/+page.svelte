@@ -64,7 +64,7 @@
 />
 
 <div class="absolute p-4 top-0 z-10 flex justify-between w-screen h-screen pointer-events-none">
-	<div class="flex flex-col bg-base-100 h-fit p-4 pointer-events-auto rounded-lg mr-4">
+	<div class="flex flex-col bg-base-100 h-fit p-4 pointer-events-auto rounded-lg mr-4 shadow-lg">
 		<Logo />
 
 		<SearchForm onSubmitForm={updateGraph} {onCenterGraph} />

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { LayoutKeys } from '../graph/layout';
 	import { degreesOfSeparation, resource, layoutKey, searchTerm } from '../stores';
+	import Icon from './Icon.svelte';
 
 	export let className: string | undefined = undefined;
 
@@ -51,13 +52,15 @@
 				<option value={LayoutKeys.BREADTH_FIRST}>Breadth-first</option>
 			</select>
 		</div>
-		<button class="btn btn-primary btn-sm" type="submit">Search</button>
+		<button class="btn btn-primary btn-sm" type="submit"
+			><Icon className="mr-2" name="search" />Search</button
+		>
 		<button
 			class="btn btn-sm"
 			on:click={(e) => {
 				e.preventDefault();
 				onCenterGraph();
-			}}>Center</button
+			}}><Icon className="mr-2" name="maximize" />Center</button
 		>
 	</div>
 </form>

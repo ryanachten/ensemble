@@ -33,27 +33,30 @@
 	<div class="card-body">
 		<h2 class="card-title">{data.label}</h2>
 		<span class={`badge badge-${nodeColourMap[data.type]}`}>{data.type}</span>
-		<div class="flex items-center">
-			{#if $nodePath.find((x) => x.id === data.id)}
-				<span class="mr-2">Remove from path</span>
-				<button class="btn btn-circle btn-sm btn-error" on:click={removeItem}
-					><Icon name="minus" />
-				</button>
-			{:else}
-				<span class="mr-2">Add to path</span>
-				<button class="btn btn-circle btn-sm btn-success" on:click={addItem}
-					><Icon name="plus" /></button
-				>
-			{/if}
-		</div>
 		<div>
 			<span class="mr-2">Search graph</span>
-			<button class="btn btn-circle btn-sm" on:click={searchItem}><Icon name="search" /></button>
+			<button class="btn btn-circle btn-sm btn-primary" on:click={searchItem}
+				><Icon name="search" /></button
+			>
 		</div>
 		<div>
 			<a class="flex items-center mr-2" href={wikipediaUrl} target="_blank"
 				>View on Wikipedia <Icon name="external-link" className="ml-2 inline" /></a
 			>
+		</div>
+		<div class="divider" />
+		<div>
+			{#if $nodePath.find((x) => x.id === data.id)}
+				<span class="mr-2">Remove from path</span>
+				<button class="btn btn-circle btn-sm btn-warning" on:click={removeItem}
+					><Icon name="minus" />
+				</button>
+			{:else}
+				<span class="mr-2">Add to path</span>
+				<button class="btn btn-circle btn-sm btn-warning" on:click={addItem}
+					><Icon name="plus" /></button
+				>
+			{/if}
 		</div>
 	</div>
 </div>

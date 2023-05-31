@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { nodePath, confirmedNodePath } from '../stores';
 	import { nodeColourMap } from '../theme';
+	import Icon from './Icon.svelte';
 
 	const confirmNodePath = () => confirmedNodePath.set($nodePath);
 	const resetNodePath = () => {
@@ -17,10 +18,12 @@
 	</ul>
 	<div class="grid grid-cols-2 gap-4">
 		{#if $nodePath.length > 1}
-			<button class="btn btn-primary btn-sm" type="submit" on:click={confirmNodePath}
-				>Find path</button
+			<button class="btn btn-warning btn-sm" type="submit" on:click={confirmNodePath}
+				><Icon className="mr-2" name="compass" />Find path</button
 			>
 		{/if}
-		<button class="btn btn-sm" type="reset" on:click={resetNodePath}>Reset</button>
+		<button class="btn btn-sm" type="reset" on:click={resetNodePath}
+			><Icon className="mr-2" name="rotate-ccw" />Reset</button
+		>
 	</div>
 </form>

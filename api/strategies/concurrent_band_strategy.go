@@ -16,6 +16,8 @@ func BuildConcurrentBandGraph(bandName string, bandUrl string, graph models.Conc
 	return graph
 }
 
+// TODO: we don't actually use these return values in the concurrent operations
+// whereas we do in the sequential operations - wonder if that's contributing to the problem?
 func getConcurrentBand(bandName string, bandUrl string, graph models.ConcurrentGraph, scraper models.WikiScraper, layer int, maxLayers int, waitGroup *sync.WaitGroup) models.Graph {
 	if layer > maxLayers {
 		return graph
@@ -53,38 +55,4 @@ func getConcurrentBand(bandName string, bandUrl string, graph models.ConcurrentG
 		graph.AddEdge(bandName, genre.Title, "genre")
 	}
 	return graph
-}
-
-func getConcurrentArtist(artistName, artistUrl string, graph models.ConcurrentGraph, scraper models.WikiScraper, layer int, maxLayers int, waitGroup *sync.WaitGroup) {
-	if layer > maxLayers {
-		return
-	}
-
-	// If the vertex exists and complete, we don't need to revisit it
-	vertexExists := graph.HasCompleteVertex(artistName)
-	if vertexExists {
-		return
-	}
-
-	// Add an entry to the wait group and defer removing entry until function completes
-	waitGroup.Add(1)
-	defer waitGroup.Done()
-
-	metadata := scraper.GetArtistMetadata(artistUrl)
-	graph.UpdateVertexData(artistName, metadata.ImageUrl)
-
-	for _, currentBand := range metadata.MemberOf {
-		graph.AddVertex(currentBand.Title, models.VertexData{Type: models.Band, Url: currentBand.Url})
-		graph.AddEdge(artistName, currentBand.Title, "member of")
-		if currentBand.Url != nil {
-			go getConcurrentBand(currentBand.Title, *currentBand.Url, graph, scraper, layer+1, maxLayers, waitGroup)
-		}
-	}
-	for _, formerBand := range metadata.FormerlyOf {
-		graph.AddVertex(formerBand.Title, models.VertexData{Type: models.Band, Url: formerBand.Url})
-		graph.AddEdge(artistName, formerBand.Title, "formerly of")
-		if formerBand.Url != nil {
-			go getConcurrentBand(formerBand.Title, *formerBand.Url, graph, scraper, layer+1, maxLayers, waitGroup)
-		}
-	}
 }

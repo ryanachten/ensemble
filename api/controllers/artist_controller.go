@@ -8,9 +8,9 @@ import (
 	"ensemble/services"
 )
 
-func GetGenre(c *gin.Context) {
+func GetArtist(c *gin.Context) {
 	params := ParseQueryParameters(c)
-	clientGraph, err := services.BuildGenreGraph(params.Strategy, params.Name, params.DegreesOfSeparation)
+	clientGraph, err := services.BuildArtistGraph(params.Strategy, params.Name, params.DegreesOfSeparation)
 
 	if err != nil {
 		c.AbortWithStatusJSON(500, err.Error())

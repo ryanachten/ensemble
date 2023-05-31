@@ -1,10 +1,9 @@
-package genre_service
+package services
 
 import (
 	"ensemble/clients"
 	"ensemble/models"
-	"ensemble/services"
-	"ensemble/services/genre_service/strategies"
+	"ensemble/strategies"
 )
 
 func BuildGenreGraph(strategy models.GraphStrategy, genreName string, degreesOfSeparation int) (*models.ClientGraph, error) {
@@ -13,7 +12,7 @@ func BuildGenreGraph(strategy models.GraphStrategy, genreName string, degreesOfS
 		return nil, err
 	}
 
-	maxLayers := services.GetMaxLayers(degreesOfSeparation)
+	maxLayers := getMaxLayers(degreesOfSeparation)
 	requestUrl := clients.GetPageUrl(searchResults[0].Title)
 	scraper := models.NewWikiScraper()
 

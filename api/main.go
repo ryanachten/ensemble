@@ -15,6 +15,7 @@ func main() {
 	pprof.Register(router)
 	router.Use(cors.Default())
 	router.GET("/bands", controllers.GetBand)
+	router.GET("/artists", controllers.GetArtist)
 	router.GET("/genres", controllers.GetGenre)
 	err := router.Run()
 	log.Printf("Router error %v", err)

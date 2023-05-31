@@ -5,12 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"ensemble/services/band_service"
+	"ensemble/services"
 )
 
 func GetBand(c *gin.Context) {
 	params := ParseQueryParameters(c)
-	clientGraph, err := band_service.BuildBandGraph(params.Strategy, params.Name, params.DegreesOfSeparation)
+	clientGraph, err := services.BuildBandGraph(params.Strategy, params.Name, params.DegreesOfSeparation)
 
 	if err != nil {
 		c.AbortWithStatusJSON(500, err.Error())

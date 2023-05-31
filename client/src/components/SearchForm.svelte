@@ -27,6 +27,7 @@
 			</label>
 			<select class="select select-sm" id="resource" bind:value={$resource}>
 				<option value="bands">Band</option>
+				<option value="artists">Artist</option>
 				<option value="genres">Genre</option>
 			</select>
 		</div>

@@ -45,33 +45,3 @@ func getSequentialBand(bandName string, bandUrl string, graph models.Graph, scra
 	}
 	return graph
 }
-
-func getSequentialArtist(artistName, artistUrl string, graph models.Graph, scraper models.WikiScraper, layer int, maxLayers int) {
-	if layer > maxLayers {
-		return
-	}
-
-	// If the vertex exists and complete, we don't need to revisit it
-	vertexExists := graph.HasCompleteVertex(artistName)
-	if vertexExists {
-		return
-	}
-
-	metadata := scraper.GetArtistMetadata(artistUrl)
-	graph.UpdateVertexData(artistName, metadata.ImageUrl)
-
-	for _, currentBand := range metadata.MemberOf {
-		graph.AddVertex(currentBand.Title, models.VertexData{Type: models.Band, Url: currentBand.Url})
-		graph.AddEdge(artistName, currentBand.Title, "member of")
-		if currentBand.Url != nil {
-			getSequentialBand(currentBand.Title, *currentBand.Url, graph, scraper, layer+1, maxLayers)
-		}
-	}
-	for _, formerBand := range metadata.FormerlyOf {
-		graph.AddVertex(formerBand.Title, models.VertexData{Type: models.Band, Url: formerBand.Url})
-		graph.AddEdge(artistName, formerBand.Title, "formerly of")
-		if formerBand.Url != nil {
-			getSequentialBand(formerBand.Title, *formerBand.Url, graph, scraper, layer+1, maxLayers)
-		}
-	}
-}

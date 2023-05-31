@@ -1,10 +1,9 @@
-package band_service
+package services
 
 import (
 	"ensemble/clients"
 	"ensemble/models"
-	"ensemble/services"
-	"ensemble/services/band_service/strategies"
+	"ensemble/strategies"
 )
 
 // Builds a band graph using a given graph strategy
@@ -16,7 +15,7 @@ func BuildBandGraph(strategy models.GraphStrategy, bandName string, degreesOfSep
 		return nil, err
 	}
 
-	maxLayers := services.GetMaxLayers(degreesOfSeparation)
+	maxLayers := getMaxLayers(degreesOfSeparation)
 	requestUrl := clients.GetPageUrl(searchResults[0].Title)
 	scraper := models.NewWikiScraper()
 

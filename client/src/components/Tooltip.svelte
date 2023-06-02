@@ -23,40 +23,36 @@
 			degreesOfSeparation: $degreesOfSeparation
 		});
 	};
-
 	const wikipediaUrl = `https://en.wikipedia.org/w/index.php?title=${encodeURIComponent(
 		data.label
 	)}`;
+
+	$: isInPath = $nodePath.find((x) => x.id === data.id);
 </script>
 
 <div class="card bg-base-100 shadow-xl z-20">
 	<div class="card-body">
 		<h2 class="card-title">{data.label}</h2>
 		<span class={`badge badge-${nodeColourMap[data.type]}`}>{data.type}</span>
-		<div>
-			<span class="mr-2">Search graph</span>
+		<div class="grid grid-cols-[max-content] gap-4 items-center">
+			<span>Search graph</span>
 			<button class="btn btn-circle btn-sm btn-primary" on:click={searchItem}
 				><Icon name="search" /></button
 			>
-		</div>
-		<div>
-			<a class="flex items-center mr-2" href={wikipediaUrl} target="_blank"
-				>View on Wikipedia <Icon name="external-link" className="ml-2 inline" /></a
+			<span>View on Wikipedia</span>
+			<a class="btn btn-circle btn-sm" href={wikipediaUrl} target="_blank">
+				<Icon name="external-link" className="inline" /></a
 			>
-		</div>
-		<div class="divider" />
-		<div>
-			{#if $nodePath.find((x) => x.id === data.id)}
-				<span class="mr-2">Remove from path</span>
-				<button class="btn btn-circle btn-sm btn-warning" on:click={removeItem}
-					><Icon name="minus" />
-				</button>
-			{:else}
-				<span class="mr-2">Add to path</span>
-				<button class="btn btn-circle btn-sm btn-warning" on:click={addItem}
-					><Icon name="plus" /></button
-				>
-			{/if}
+			<div class="divider m-0 col-span-2" />
+			<span>{isInPath ? 'Remove from path' : 'Add to path'}</span>
+			<button
+				class="swap btn btn-circle btn-sm btn-warning"
+				class:swap-active={isInPath}
+				on:click={isInPath ? removeItem : addItem}
+			>
+				<Icon className="swap-on" name="minus" />
+				<Icon className="swap-off" name="plus" />
+			</button>
 		</div>
 	</div>
 </div>

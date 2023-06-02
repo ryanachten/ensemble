@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { nodePath, confirmedNodePath } from '../stores';
-	import { nodeColourMap } from '../theme';
 	import Icon from './Icon.svelte';
 
 	const confirmNodePath = () => confirmedNodePath.set($nodePath);
@@ -13,7 +12,7 @@
 <form>
 	<ul class="steps mb-4 w-full">
 		{#each $nodePath as node}
-			<li class={`step step-${nodeColourMap[node.type]}`}>{node.label}</li>
+			<li class="step step-warning">{node.label}</li>
 		{/each}
 	</ul>
 	<div class="grid grid-cols-2 gap-4">

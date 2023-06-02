@@ -95,7 +95,7 @@
 
 		const selectedNode = cytoscape?.$id(id);
 		const selection = selectedNode?.connectedEdges().connectedNodes();
-		cytoscape?.fit(selection);
+		cytoscape?.fit(selection).center(selectedNode);
 
 		popper = selectedNode?.popper({
 			content: () => {

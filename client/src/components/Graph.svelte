@@ -10,9 +10,8 @@
 	export let layoutKey: LayoutKeys;
 	export let className: string | undefined = undefined;
 	export let selectedId: string | undefined = undefined;
-	export const centerGraph = () => {
-		cytoscape?.center().fit();
-	};
+
+	export const centerGraph = () => cytoscape?.center().fit();
 
 	let container: HTMLDivElement;
 	let cytoscape: Core | null = null;
@@ -65,6 +64,7 @@
 				node.addClass(PATH_NODE_CLASS);
 				node.removeClass(NONE_PATH_NODE_CLASS);
 			});
+			cytoscape?.fit(pathToTarget).center(pathToTarget);
 		});
 	});
 

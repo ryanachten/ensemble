@@ -2,7 +2,6 @@
 	import { requestGraph, type Resource } from '../api';
 	import type { NodeMetadata, NodeType } from '../interfaces';
 	import { degreesOfSeparation, nodePath, resource, searchTerm } from '../stores';
-	import { nodeColourMap } from '../theme';
 	import Icon from './Icon.svelte';
 
 	export let data: NodeMetadata;
@@ -33,7 +32,7 @@
 <div class="card bg-base-100 shadow-xl z-20">
 	<div class="card-body">
 		<h2 class="card-title">{data.label}</h2>
-		<span class={`badge badge-${nodeColourMap[data.type]}`}>{data.type}</span>
+		<span class="badge">{data.type}</span>
 		<div class="grid grid-cols-[max-content] gap-4 items-center">
 			<span>Search graph</span>
 			<button class="btn btn-circle btn-sm btn-primary" on:click={searchItem}

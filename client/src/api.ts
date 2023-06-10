@@ -43,26 +43,27 @@ export const requestGraph = async ({
 		return;
 	}
 
-	const _bands: string[] = [];
-	const _artists: string[] = [];
-	const _genres: string[] = [];
+	const _bands: NodeData[] = [];
+	const _artists: NodeData[] = [];
+	const _genres: NodeData[] = [];
 
 	data.nodes.forEach((node) => {
 		const data = node.data as NodeData;
 		if (data.type === NodeType.ARTIST && data.id) {
-			_artists.push(data.id);
+			_artists.push(data);
 		}
 		if (data.type === NodeType.BAND && data.id) {
-			_bands.push(data.id);
+			_bands.push(data);
 		}
 		if (data.type === NodeType.GENRE && data.id) {
-			_genres.push(data.id);
+			_genres.push(data);
 		}
 	});
 
-	_artists.sort();
-	_bands.sort();
-	_genres.sort();
+	const sortNodes = (a: NodeData, b: NodeData) => (a.label > b.label ? 1 : -1);
+	_artists.sort(sortNodes);
+	_bands.sort(sortNodes);
+	_genres.sort(sortNodes);
 
 	bands.set(_bands);
 	artists.set(_artists);

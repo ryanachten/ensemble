@@ -1,6 +1,11 @@
 package models
 
-import "sync"
+import (
+	"sync"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+)
 
 // Adjacency list graph using mutex locks for concurrent read and writes
 type MutexGraph struct {
@@ -68,16 +73,23 @@ func (graph *MutexGraph) Wait() {
 }
 
 // Formats MutexGraph for client consumption
+var casing = cases.Title(language.English)
+
 func (graph *MutexGraph) ToClientGraph() ClientGraph {
 	var nodes []ClientNode
 	var edges []ClientEdge
 
 	for vertexKey, vertexValue := range graph.Vertices {
+		label := vertexKey
+		nodeType := vertexValue.Data.Type
+		if nodeType == Genre {
+			label = casing.String(vertexKey) // ensure all labels are formatted to title case
+		}
 		nodes = append(nodes, ClientNode{
 			Data: ClientNodeData{
 				Id:       vertexKey,
-				Label:    vertexKey,
-				Type:     vertexValue.Data.Type,
+				Label:    label,
+				Type:     nodeType,
 				ImageUrl: vertexValue.Data.ImageUrl,
 			},
 		})

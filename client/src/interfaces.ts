@@ -8,6 +8,7 @@ export enum NodeType {
 
 export interface NodeData extends NodeDataDefinition {
 	type: NodeType;
+	label: string;
 	imageUrl?: string;
 }
 

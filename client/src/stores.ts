@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { NodeMetadata } from './interfaces';
+import type { NodeData, NodeMetadata } from './interfaces';
 import type { ElementsDefinition } from 'cytoscape';
 import { LayoutKeys } from './graph/layout';
 import type { Resource } from './api';
@@ -12,9 +12,9 @@ export const layoutKey = writable<LayoutKeys>(LayoutKeys.COSE);
 export const searchTerm = writable<string>('Black Flag');
 export const resource = writable<Resource>('bands');
 
-export const bands = writable<string[]>([]);
-export const artists = writable<string[]>([]);
-export const genres = writable<string[]>([]);
+export const bands = writable<NodeData[]>([]);
+export const artists = writable<NodeData[]>([]);
+export const genres = writable<NodeData[]>([]);
 export const graphData = writable<ElementsDefinition>();
 
 export const selectedItem = writable<string>();

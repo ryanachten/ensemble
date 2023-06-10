@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { NodeType } from '../interfaces';
+	import type { NodeData } from '../interfaces';
 	import { selectedItem } from '../stores';
 
-	export let items: string[];
+	export let items: NodeData[];
 	export let title: string;
 	export let titleClassName: string;
 </script>
@@ -17,8 +17,9 @@
 		<ul class="menu menu-compact">
 			{#each items as item}
 				<li>
-					<button class:active={$selectedItem === item} on:click={() => selectedItem.set(item)}
-						>{item}</button
+					<button
+						class:active={$selectedItem === item.id}
+						on:click={() => selectedItem.set(item.id ?? '')}>{item.label}</button
 					>
 				</li>
 			{/each}

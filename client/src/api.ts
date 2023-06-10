@@ -32,6 +32,10 @@ export const requestGraph = async ({
 		const res = await fetch(
 			`${PUBLIC_API_URL}/${resource}?name=${name}&degreesOfSeparation=${degreesOfSeparation}`
 		);
+		if (!res.ok) {
+			hasError.set(true);
+			isLoading.set(false);
+		}
 		data = (await res.json()) as ElementsDefinition;
 	} catch (error) {
 		hasError.set(true);

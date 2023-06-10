@@ -12,25 +12,26 @@ func BuildGenreGraph(strategy models.GraphStrategy, genreName string, degreesOfS
 		return nil, err
 	}
 
+	searchResultTitle := searchResults[0].Title
 	maxLayers := getMaxLayers(degreesOfSeparation)
-	requestUrl := clients.GetPageUrl(searchResults[0].Title)
+	requestUrl := clients.GetPageUrl(searchResultTitle)
 	scraper := models.NewWikiScraper()
 
 	var clientGraph models.ClientGraph
 	switch strategy {
 	case models.InSync:
 		{
-			var inSyncGraph = strategies.BuildSequentialGenreGraph(genreName, requestUrl, &models.InSyncGraph{}, scraper, maxLayers)
+			var inSyncGraph = strategies.BuildSequentialGenreGraph(searchResultTitle, requestUrl, &models.InSyncGraph{}, scraper, maxLayers)
 			clientGraph = inSyncGraph.ToClientGraph()
 		}
 	case models.SyncMap:
 		{
-			var syncMapGraph = strategies.BuildConcurrentGenreGraph(genreName, requestUrl, models.NewSyncGraph(), scraper, maxLayers)
+			var syncMapGraph = strategies.BuildConcurrentGenreGraph(searchResultTitle, requestUrl, models.NewSyncGraph(), scraper, maxLayers)
 			clientGraph = syncMapGraph.ToClientGraph()
 		}
 	default:
 		{
-			var mutexGraph = strategies.BuildConcurrentGenreGraph(genreName, requestUrl, models.NewMutexGraph(), scraper, maxLayers)
+			var mutexGraph = strategies.BuildConcurrentGenreGraph(searchResultTitle, requestUrl, models.NewMutexGraph(), scraper, maxLayers)
 			clientGraph = mutexGraph.ToClientGraph()
 		}
 	}

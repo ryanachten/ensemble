@@ -1,6 +1,6 @@
 import { theme } from '../../theme';
 
-export type TestMode = 'mutex' | 'sequential' | 'sync';
+export type TestMode = 'mutex' | 'sequential' | 'syncmap';
 export type Endpoint = 'bands' | 'genres';
 
 export interface CsvRow {
@@ -17,7 +17,7 @@ export interface CsvRow {
 export const colors: Record<TestMode, string> = {
 	sequential: theme.warning,
 	mutex: theme.primary,
-	sync: theme.secondary
+	syncmap: theme.secondary
 };
 
 export type Dataset = {
@@ -52,9 +52,9 @@ export const generateDataset = (
 			datasets[testName].data.push(point);
 		} else {
 			datasets[testName] = {
-				label: `${mode ? mode : 'sync'} | ${endpoint} | ${degreesOfSeparation}°`,
-				borderColor: colors[mode] ?? colors.sync,
-				backgroundColor: colors[mode] ?? colors.sync,
+				label: `${mode ? mode : 'syncmap'} | ${endpoint} | ${degreesOfSeparation}°`,
+				borderColor: colors[mode] ?? colors.syncmap,
+				backgroundColor: colors[mode] ?? colors.syncmap,
 				data: [point]
 			};
 		}

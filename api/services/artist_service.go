@@ -28,7 +28,7 @@ func BuildArtistGraph(strategy models.GraphStrategy, artistName string, degreesO
 		}
 	case models.SyncMap:
 		{
-			var syncMapGraph = strategies.BuildConcurrentArtistGraph(searchResultTitle, requestUrl, models.NewSyncGraph(), scraper, maxLayers)
+			var syncMapGraph = strategies.BuildConcurrentArtistGraph(searchResultTitle, requestUrl, models.NewSyncMapGraph(), scraper, maxLayers)
 			clientGraph = syncMapGraph.ToClientGraph()
 		}
 	default:

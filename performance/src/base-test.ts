@@ -20,7 +20,7 @@ interface TestConfig {
 }
 
 export enum GraphMode {
-  SYNC = "sync",
+  SYNCMAP = "syncmap",
   SEQUENTIAL = "sequential",
   MUTEX = "mutex",
 }

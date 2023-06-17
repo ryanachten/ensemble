@@ -21,7 +21,7 @@
 				plugins: {
 					title: {
 						display: true,
-						text: 'Requests failed'
+						text: 'Requests failure'
 					}
 				}
 			}

@@ -31,7 +31,7 @@ func BuildBandGraph(strategy models.GraphStrategy, bandName string, degreesOfSep
 		}
 	case models.SyncMap:
 		{
-			var syncMapGraph = strategies.BuildConcurrentBandGraph(formattedTitle, requestUrl, models.NewSyncGraph(), scraper, maxLayers)
+			var syncMapGraph = strategies.BuildConcurrentBandGraph(formattedTitle, requestUrl, models.NewSyncMapGraph(), scraper, maxLayers)
 			clientGraph = syncMapGraph.ToClientGraph()
 		}
 	default:

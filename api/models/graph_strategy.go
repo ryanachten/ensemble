@@ -6,14 +6,14 @@ type GraphStrategy string
 
 const (
 	Sequential GraphStrategy = "sequential"
-	SyncMap    GraphStrategy = "sync"
+	SyncMap    GraphStrategy = "syncmap"
 	Mutex      GraphStrategy = "mutex"
 )
 
 var (
 	strategyMap = map[string]GraphStrategy{
 		"sequential": Sequential,
-		"sync":       SyncMap,
+		"syncmap":    SyncMap,
 		"mutex":      Mutex,
 	}
 )

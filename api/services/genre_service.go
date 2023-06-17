@@ -26,7 +26,7 @@ func BuildGenreGraph(strategy models.GraphStrategy, genreName string, degreesOfS
 		}
 	case models.SyncMap:
 		{
-			var syncMapGraph = strategies.BuildConcurrentGenreGraph(searchResultTitle, requestUrl, models.NewSyncGraph(), scraper, maxLayers)
+			var syncMapGraph = strategies.BuildConcurrentGenreGraph(searchResultTitle, requestUrl, models.NewSyncMapGraph(), scraper, maxLayers)
 			clientGraph = syncMapGraph.ToClientGraph()
 		}
 	default:

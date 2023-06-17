@@ -7,7 +7,7 @@ export default () => {
   const nodeCount = parseInt(__ENV["nodeCount"]);
   const edgeCount = parseInt(__ENV["edgeCount"]);
 
-  const validModes = [GraphMode.SYNC, GraphMode.MUTEX, GraphMode.SEQUENTIAL];
+  const validModes = [GraphMode.SYNCMAP, GraphMode.MUTEX, GraphMode.SEQUENTIAL];
   if (Boolean(mode) && !validModes.includes(mode as GraphMode))
     return console.error("mode invalid", mode);
 

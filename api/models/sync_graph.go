@@ -5,21 +5,20 @@ import (
 )
 
 // Vertex with edges stored using a sync map for concurrent read and writes
-// While this was performant, it seemed to result in data loss. Use the more reliable `SyncGraph`
-type SyncVertex struct {
+type SyncMapVertex struct {
 	Data  VertexData
 	Edges sync.Map // sync map[string]*Edge
 }
 
 // Adjacency list graph stored using a sync map for concurrent read and writes
-type SyncGraph struct {
+type SyncMapGraph struct {
 	Vertices sync.Map       // sync map[string]*Vertex
 	Queue    chan func()    // stores a list of actions to execute sequentially
 	Actions  sync.WaitGroup // represents tasks waiting in the queue
 }
 
-func NewSyncGraph() *SyncGraph {
-	graph := &SyncGraph{
+func NewSyncMapGraph() *SyncMapGraph {
+	graph := &SyncMapGraph{
 		Queue: make(chan func()),
 	}
 
@@ -28,41 +27,41 @@ func NewSyncGraph() *SyncGraph {
 	return graph
 }
 
-func (graph *SyncGraph) AddVertex(key string, data VertexData) {
+func (graph *SyncMapGraph) AddVertex(key string, data VertexData) {
 	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		_, vertexExists := graph.Vertices.Load(key)
 		if vertexExists {
 			return
 		}
-		graph.Vertices.Store(key, SyncVertex{Data: data})
+		graph.Vertices.Store(key, SyncMapVertex{Data: data})
 	}
 }
 
-func (graph *SyncGraph) UpdateVertexData(key string, imageUrl string) {
+func (graph *SyncMapGraph) UpdateVertexData(key string, imageUrl string) {
 	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		vertex, vertexExists := graph.Vertices.Load(key)
 		if !vertexExists {
 			return
 		}
-		updatedVertex := vertex.(SyncVertex) // sync map stores values as `any`, so we need to cast them back to vertices
+		updatedVertex := vertex.(SyncMapVertex) // sync map stores values as `any`, so we need to cast them back to vertices
 		updatedVertex.Data.ImageUrl = imageUrl
 		updatedVertex.Data.IsComplete = true
 		graph.Vertices.Store(key, updatedVertex)
 	}
 }
 
-func (graph *SyncGraph) HasCompleteVertex(key string) bool {
+func (graph *SyncMapGraph) HasCompleteVertex(key string) bool {
 	vertex, vertexExists := graph.Vertices.Load(key)
 	if vertexExists {
-		vertexData := vertex.(SyncVertex).Data
+		vertexData := vertex.(SyncMapVertex).Data
 		return vertexData.IsComplete
 	}
 	return false
 }
 
-func (graph *SyncGraph) AddEdge(srcKey, destKey, label string) {
+func (graph *SyncMapGraph) AddEdge(srcKey, destKey, label string) {
 	graph.Actions.Add(1)
 	graph.Queue <- func() {
 		// Ensure src and dest keys exist
@@ -71,25 +70,25 @@ func (graph *SyncGraph) AddEdge(srcKey, destKey, label string) {
 		if !srcVertexExists || !destVertexExists {
 			return
 		}
-		updatedVertex := srcVertex.(SyncVertex)
+		updatedVertex := srcVertex.(SyncMapVertex)
 		updatedVertex.Edges.Store(destKey, Edge{Label: label})
 		graph.Vertices.Store(srcKey, updatedVertex)
 	}
 
 }
 
-func (graph *SyncGraph) Wait() {
+func (graph *SyncMapGraph) Wait() {
 	graph.Actions.Wait()
 }
 
-// Formats SyncGraph for client consumption
-func (graph *SyncGraph) ToClientGraph() ClientGraph {
+// Formats SyncMapGraph for client consumption
+func (graph *SyncMapGraph) ToClientGraph() ClientGraph {
 	var nodes []ClientNode
 	var edges []ClientEdge
 
 	graph.Vertices.Range(func(outerKey, outerValue any) bool {
 		vertexKey := outerKey.(string)
-		vertexValue := outerValue.(SyncVertex)
+		vertexValue := outerValue.(SyncMapVertex)
 		nodes = append(nodes, ClientNode{
 			Data: ClientNodeData{
 				Id:       vertexKey,
@@ -121,7 +120,7 @@ func (graph *SyncGraph) ToClientGraph() ClientGraph {
 }
 
 // Watches for actions added to the queue.
-func (graph *SyncGraph) watchQueue() {
+func (graph *SyncMapGraph) watchQueue() {
 	for {
 		action := <-graph.Queue
 		action()

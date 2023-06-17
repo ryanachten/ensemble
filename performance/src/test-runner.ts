@@ -15,7 +15,7 @@ interface TestConfig extends DegreeConfig {
 }
 
 export enum GraphMode {
-  SYNC = "sync",
+  SYNCMAP = "syncmap",
   SEQUENTIAL = "sequential",
   MUTEX = "mutex",
 }
@@ -49,7 +49,7 @@ program.parse();
 const {
   degreesOfSeparation = [1, 2, 3, 5],
   endpoints = ["bands", "genres"],
-  modes = [GraphMode.SYNC, GraphMode.MUTEX, GraphMode.SEQUENTIAL],
+  modes = [GraphMode.SYNCMAP, GraphMode.MUTEX, GraphMode.SEQUENTIAL],
 }: {
   degreesOfSeparation: number[];
   endpoints: Endpoint[];
@@ -91,7 +91,7 @@ const executeK6Test = ({
   endpoint,
 }: TestConfig): Promise<TestResult> => {
   const testName = `endpoint-${endpoint}-degreesOfSeparation-${degreesOfSeparation}-mode-${
-    mode ? mode : "sync"
+    mode ? mode : "syncmap"
   }`;
   return new Promise((resolve, reject) => {
     exec(

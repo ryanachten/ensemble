@@ -15,14 +15,14 @@ export interface CsvRow {
 }
 
 export const colors: Record<TestMode, string> = {
-	sequential: theme.warning,
+	sequential: theme.accent,
 	mutex: theme.primary,
 	syncmap: theme.secondary
 };
 
 export type Dataset = {
 	label: string;
-	data: any[];
+	data: { x: string; y: number }[];
 	borderColor: string;
 	backgroundColor: string;
 };

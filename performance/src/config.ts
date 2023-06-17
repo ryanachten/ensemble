@@ -24,8 +24,8 @@ const config: Record<Endpoint, Record<number, DegreeConfig>> = {
     5: {
       vus: 1,
       iterations: 5,
-      nodeCount: 641,
-      edgeCount: 951,
+      nodeCount: 645,
+      edgeCount: 964,
     },
   },
   genres: {

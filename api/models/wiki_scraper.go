@@ -38,6 +38,12 @@ type WikiScraper struct {
 	Domains colly.CollectorOption
 }
 
+var infoBoxImageSelector = ".infobox-image img"
+var infoBoxRowSelector = ".infobox tr"
+var infoBoxLabelSelector = ".infobox-label"
+var imageUrlPRefix = "https:"
+var footnoteRegex = regexp.MustCompile(`\[\d*\]`)
+
 func NewWikiScraper() WikiScraper {
 	return WikiScraper{
 		Domains: colly.AllowedDomains("en.wikipedia.org"),
@@ -48,12 +54,12 @@ func (scraper *WikiScraper) GetBandMetadata(requestUrl string) BandMetadata {
 	collector := colly.NewCollector(scraper.Domains)
 	var metadata BandMetadata
 
-	collector.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {
-		metadata.ImageUrl = "https:" + e.Attr("src")
+	collector.OnHTML(infoBoxImageSelector, func(e *colly.HTMLElement) {
+		metadata.ImageUrl = imageUrlPRefix + e.Attr("src")
 	})
 
-	collector.OnHTML(".infobox tr", func(e *colly.HTMLElement) {
-		label := e.DOM.Find(".infobox-label").Text()
+	collector.OnHTML(infoBoxRowSelector, func(e *colly.HTMLElement) {
+		label := e.DOM.Find(infoBoxLabelSelector).Text()
 		if label == "Members" {
 			metadata.Members = scrapeInfoBoxDataLinks(e)
 		}
@@ -74,12 +80,12 @@ func (scraper *WikiScraper) GetArtistMetadata(requestUrl string) ArtistMetadata 
 	collector := colly.NewCollector(scraper.Domains)
 	var metadata ArtistMetadata
 
-	collector.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {
-		metadata.ImageUrl = "https:" + e.Attr("src")
+	collector.OnHTML(infoBoxImageSelector, func(e *colly.HTMLElement) {
+		metadata.ImageUrl = imageUrlPRefix + e.Attr("src")
 	})
 
-	collector.OnHTML(".infobox tr", func(e *colly.HTMLElement) {
-		label := e.DOM.Find(".infobox-label").Text()
+	collector.OnHTML(infoBoxRowSelector, func(e *colly.HTMLElement) {
+		label := e.DOM.Find(infoBoxLabelSelector).Text()
 		if label == "Member of" {
 			metadata.MemberOf = scrapeInfoBoxDataLinks(e)
 		}
@@ -97,12 +103,12 @@ func (scraper *WikiScraper) GetGenreMetadata(requestUrl string) GenreMetadata {
 	collector := colly.NewCollector(scraper.Domains)
 	var metadata GenreMetadata
 
-	collector.OnHTML(".infobox-image img", func(e *colly.HTMLElement) {
-		metadata.ImageUrl = "https:" + e.Attr("src")
+	collector.OnHTML(infoBoxImageSelector, func(e *colly.HTMLElement) {
+		metadata.ImageUrl = imageUrlPRefix + e.Attr("src")
 	})
 
-	collector.OnHTML(".infobox tr", func(e *colly.HTMLElement) {
-		label := e.DOM.Find(".infobox-label").Text()
+	collector.OnHTML(infoBoxRowSelector, func(e *colly.HTMLElement) {
+		label := e.DOM.Find(infoBoxLabelSelector).Text()
 		header := e.DOM.Find(".infobox-header").Text()
 		if label == "Stylistic origins" {
 			metadata.StylisticOrigins = scrapeInfoBoxDataLinks(e)
@@ -161,7 +167,6 @@ func scrapeInfoBoxFullDataLinks(element *colly.HTMLElement, selection *goquery.S
 
 func getLink(element *colly.HTMLElement, s *goquery.Selection, url string, hasUrl bool) (Link, bool) {
 	// Remove footnotes from link title
-	footnoteRegex := regexp.MustCompile(`\[\d*\]`)
 	title := footnoteRegex.ReplaceAllString(s.Text(), "")
 	if title == "" {
 		return Link{}, false

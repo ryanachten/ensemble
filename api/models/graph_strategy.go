@@ -5,16 +5,16 @@ import "strings"
 type GraphStrategy string
 
 const (
-	InSync  GraphStrategy = "insync"
-	SyncMap GraphStrategy = "sync"
-	Mutex   GraphStrategy = "mutex"
+	Sequential GraphStrategy = "sequential"
+	SyncMap    GraphStrategy = "sync"
+	Mutex      GraphStrategy = "mutex"
 )
 
 var (
 	strategyMap = map[string]GraphStrategy{
-		"insync": InSync,
-		"sync":   SyncMap,
-		"mutex":  Mutex,
+		"sequential": Sequential,
+		"sync":       SyncMap,
+		"mutex":      Mutex,
 	}
 )
 

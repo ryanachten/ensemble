@@ -24,10 +24,10 @@ func BuildBandGraph(strategy models.GraphStrategy, bandName string, degreesOfSep
 
 	var clientGraph models.ClientGraph
 	switch strategy {
-	case models.InSync:
+	case models.Sequential:
 		{
-			var inSyncGraph = strategies.BuildSequentialBandGraph(formattedTitle, requestUrl, &models.InSyncGraph{}, scraper, maxLayers)
-			clientGraph = inSyncGraph.ToClientGraph()
+			var sequentialGraph = strategies.BuildSequentialBandGraph(formattedTitle, requestUrl, &models.SequentialGraph{}, scraper, maxLayers)
+			clientGraph = sequentialGraph.ToClientGraph()
 		}
 	case models.SyncMap:
 		{

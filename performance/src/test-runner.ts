@@ -7,17 +7,17 @@ const fs = require("fs");
 const path = require("path");
 const { program } = require("commander");
 
-enum GraphMode {
-  SYNC = "sync",
-  NON_SYNC = "insync",
-  MUTEX = "mutex",
-}
-
 interface TestConfig extends DegreeConfig {
   mode: GraphMode;
   dateUtc: string;
   degreesOfSeparation: number;
   endpoint: Endpoint;
+}
+
+export enum GraphMode {
+  SYNC = "sync",
+  SEQUENTIAL = "sequential",
+  MUTEX = "mutex",
 }
 
 interface TestResult {
@@ -49,7 +49,7 @@ program.parse();
 const {
   degreesOfSeparation = [1, 2, 3, 5],
   endpoints = ["bands", "genres"],
-  modes = [GraphMode.SYNC, GraphMode.MUTEX, GraphMode.NON_SYNC],
+  modes = [GraphMode.SYNC, GraphMode.MUTEX, GraphMode.SEQUENTIAL],
 }: {
   degreesOfSeparation: number[];
   endpoints: Endpoint[];

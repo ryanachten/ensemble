@@ -19,10 +19,10 @@ func BuildGenreGraph(strategy models.GraphStrategy, genreName string, degreesOfS
 
 	var clientGraph models.ClientGraph
 	switch strategy {
-	case models.InSync:
+	case models.Sequential:
 		{
-			var inSyncGraph = strategies.BuildSequentialGenreGraph(searchResultTitle, requestUrl, &models.InSyncGraph{}, scraper, maxLayers)
-			clientGraph = inSyncGraph.ToClientGraph()
+			var sequentialGraph = strategies.BuildSequentialGenreGraph(searchResultTitle, requestUrl, &models.SequentialGraph{}, scraper, maxLayers)
+			clientGraph = sequentialGraph.ToClientGraph()
 		}
 	case models.SyncMap:
 		{

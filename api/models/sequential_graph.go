@@ -1,11 +1,11 @@
 package models
 
 // Adjacency list graph. Does not cater for concurrent read and writes
-type InSyncGraph struct {
+type SequentialGraph struct {
 	Vertices map[string]*Vertex
 }
 
-func (graph *InSyncGraph) AddVertex(key string, data VertexData) {
+func (graph *SequentialGraph) AddVertex(key string, data VertexData) {
 	if graph.Vertices == nil {
 		graph.Vertices = map[string]*Vertex{}
 	}
@@ -16,11 +16,11 @@ func (graph *InSyncGraph) AddVertex(key string, data VertexData) {
 	graph.Vertices[key] = &Vertex{Data: data, Edges: map[string]*Edge{}}
 }
 
-func (graph *InSyncGraph) UpdateVertexData(key string, imageUrl string) {
+func (graph *SequentialGraph) UpdateVertexData(key string, imageUrl string) {
 	graph.Vertices[key].Data.ImageUrl = imageUrl
 }
 
-func (graph *InSyncGraph) HasCompleteVertex(key string) bool {
+func (graph *SequentialGraph) HasCompleteVertex(key string) bool {
 	vertex, exists := graph.Vertices[key]
 	if exists {
 		return vertex.Data.IsComplete
@@ -28,7 +28,7 @@ func (graph *InSyncGraph) HasCompleteVertex(key string) bool {
 	return false
 }
 
-func (graph *InSyncGraph) AddEdge(srcKey, destKey, label string) {
+func (graph *SequentialGraph) AddEdge(srcKey, destKey, label string) {
 	// Ensure src and dest keys exist
 	_, srcVertexExists := graph.Vertices[srcKey]
 	_, destVertexExists := graph.Vertices[destKey]
@@ -40,7 +40,7 @@ func (graph *InSyncGraph) AddEdge(srcKey, destKey, label string) {
 }
 
 // Formats Graph for client consumption
-func (graph *InSyncGraph) ToClientGraph() ClientGraph {
+func (graph *SequentialGraph) ToClientGraph() ClientGraph {
 	var nodes []ClientNode
 	var edges []ClientEdge
 

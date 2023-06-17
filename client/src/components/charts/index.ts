@@ -1,7 +1,6 @@
-import type { Point } from 'chart.js';
 import { theme } from '../../theme';
 
-export type TestMode = 'mutex' | 'insync' | 'sync';
+export type TestMode = 'mutex' | 'sequential' | 'sync';
 export type Endpoint = 'bands' | 'genres';
 
 export interface CsvRow {
@@ -16,7 +15,7 @@ export interface CsvRow {
 }
 
 export const colors: Record<TestMode, string> = {
-	insync: theme.warning,
+	sequential: theme.warning,
 	mutex: theme.primary,
 	sync: theme.secondary
 };

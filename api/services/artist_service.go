@@ -21,10 +21,10 @@ func BuildArtistGraph(strategy models.GraphStrategy, artistName string, degreesO
 
 	var clientGraph models.ClientGraph
 	switch strategy {
-	case models.InSync:
+	case models.Sequential:
 		{
-			var inSyncGraph = strategies.BuildSequentialArtistGraph(searchResultTitle, requestUrl, &models.InSyncGraph{}, scraper, maxLayers)
-			clientGraph = inSyncGraph.ToClientGraph()
+			var sequentialGraph = strategies.BuildSequentialArtistGraph(searchResultTitle, requestUrl, &models.SequentialGraph{}, scraper, maxLayers)
+			clientGraph = sequentialGraph.ToClientGraph()
 		}
 	case models.SyncMap:
 		{
